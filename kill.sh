@@ -1,0 +1,1 @@
+kill `lsof -ti tcp:3000`
