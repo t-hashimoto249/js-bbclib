@@ -9,14 +9,9 @@ export default class {
         this.id_length = DEFAULT_ID_LEN;
         this.asset_id = null; // byte
         //bbc-simpleは基本は8byte
-        //if (user_id != null && this.id_length < 32) {
-        //    this.user_id = user_id["id_length"];
-        //}else {
         this.user_id = user_id; // byte
-        //}
 
         this.nonce = null; // byte
-        //this.nonce = get_random_value();
         this.asset_file_size = 0;
         this.asset_file = null;
         this.asset_file_digest = null;
@@ -26,6 +21,7 @@ export default class {
     }
 
     showAsset(){
+        console.log("---------showAsset--------");
         console.log("this.asset_id");
         console.log(this.asset_id);
         console.log("this.user_id");
@@ -42,6 +38,7 @@ export default class {
         console.log(this.asset_body_size);
         console.log("this.asset_body");
         console.log(this.asset_body);
+        console.log("--------------------------");
 
     }
 
@@ -77,12 +74,12 @@ export default class {
     }
 
     async digest(){
+        console.log("---------------digest--------");
         let target = this.serialize(true);
-        console.log("target=");
         console.log(target);
-        let dump = bson.deserialize(target);
-        console.log(dump);
         this.asset_id = await jscu.crypto.hash.getHash('SHA-256', target);
+        console.log("-----------------------------");
+
         return this.asset_id;
     }
 

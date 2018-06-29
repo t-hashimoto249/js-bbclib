@@ -89,9 +89,9 @@ describe('test', () => {
         await bbcAsset.add_asset(null, asset_body);
         let digest = await bbcAsset.digest();
 
-        console.log("-------------------");
+
         bbcAsset.showAsset();
-        console.log("-------------------");
+
         console.log(digest);
         for (let i = 0; i < 8 ; i++){
             console.log(digest[i].toString(16));
@@ -126,6 +126,8 @@ describe('test', () => {
 
     });
 */
+
+/*
     it('Test for jscu module.', async () => {
         //b'6e 34 0b 9c ff b3 7a 98 9c a5 44 e6 bb 78 0a 2c 78 90 1d 3f b3 37 38 76 85 11 a3 06 17 af a0 1d'
         //b'\x00'
@@ -178,13 +180,9 @@ describe('test', () => {
         for (let i = 0; i < 8; i++) msg[i] = 0xFF & 0x00;
 
         const digest = await jscu.crypto.hash.getHash('SHA-256', msg);
-        //console.log(digest.toString());
 
-        /*for(let i = 0; i < 32; i++){
-            console.log(digest[i].toString(16));
-        }*/
     });
-
+*/
         //$scope.bytes2hexs = function(bytes) {
     //    return bytes.map(function(b) { var s = b.toString(16); return b < 0x10 ? '0'+s : s; }).join(' ').toUpperCase();
     //}
