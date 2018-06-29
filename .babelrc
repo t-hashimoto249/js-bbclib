@@ -1,9 +1,24 @@
 {
   "presets": [
-    ["env", {
+    [ "@babel/preset-env", {
       "targets": {
-        "browsers": ["last 2 versions", "safari >= 7"]
+        "node": "current",
+        "electron": "2.0.2"
+      },
+      "useBuiltIns": false
+    } ]
+  ],
+  "ignore": [ "node_modules" ],
+  "only": [ "html/src/bbcclass", "test" ],
+  "plugins": [
+    "babel-plugin-dynamic-import-node-sync",
+    "@babel/plugin-syntax-dynamic-import",
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "@babel/polyfill": false,
+        "regenerator": true
       }
-    }]
+    ]
   ]
 }

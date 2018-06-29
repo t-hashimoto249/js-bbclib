@@ -1,6 +1,14 @@
 'use strict';
 
+import buffer from 'buffer';
+//import jscu from 'js-crypto-utils';
+import { BBcTransaction } from "../src/bbcclass/BBcTransaction";
+import { BBcWitness } from "../src/bbcclass/BBcWitness";
+
+const Buffer = buffer.Buffer;
+
 var $ = require('jquery');
+
 
 // グローバル変数
 var global;
@@ -11,11 +19,10 @@ $(document).ready(function () {
     console.log("start"); // コンソール出力
 
     // ローカル変数
-    let domain  = 'c93033db5327d138160ff78d5ca980e76c65cf1e108637b9e87a469700fbbf52';
-    let user1 = '207eba8d14689086';
+    let domain  = '0699abfa8e8d1000fbd51880787de7ffc5fe0604ee7a2378b7a1f1b2f867c6c3';
+    let user1 = 'a2580339fa1d28ad';
+    let transaction_id1 = 'd15881e9f7c9656f';
     let user2 = '3e81ad1f758f84db';
-
-    let bson = new BSON();
 
     // set1ボタンクリックで各変数に1を代入
     $("#domain_setup").click(function(){
@@ -24,10 +31,11 @@ $(document).ready(function () {
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
 
-        let parameter = {'domain_id': 'eb201274a32dd0616e321ba341ffb6e928782d3f3398a06d343289e67342dbce'};
+        let parameter = {'domain_id': domain};
 
         xhr.send(JSON.stringify(parameter));
         xhr.abort(); // 再利用する際にも abort() しないと再利用できないらしい.
+
     });
 
     $("#insert_transaction").click(function(){
@@ -44,20 +52,23 @@ $(document).ready(function () {
         };
 
         xhr.send(parameter);
+
         xhr.abort(); // 再利用する際にも abort() しないと再利用できないらしい.
     });
 
     $("#search_transaction").click(function(){
         console.log("sendMessage"); // コンソール出力
         xhr.open( 'POST', 'http://127.0.0.1:3000/search_transaction/' + domain, false );
+
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let parameter = {
             'source_user_id': user1,
-            'transaction_id': txid.hex()
+            'transaction_id': transaction_id1
         };
 
-        xhr.send(parameter);
+        xhr.send(JSON.stringify(parameter));
+
         xhr.abort(); // 再利用する際にも abort() しないと再利用できないらしい.
     });
 
@@ -142,15 +153,19 @@ $(document).ready(function () {
     });
 
     $("#close_domain").click(function(){
-        console.log("sendMessage"); // コンソール出力
+        /*console.log("sendMessage"); // コンソール出力
         xhr.open( 'POST', 'http://127.0.0.1:3000/domain_close/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         xhr.send();
         xhr.abort(); // 再利用する際にも abort() しないと再利用できないらしい.
+        */
+        let keypair = new KeyPair();
     });
 
 });
+
+
 
 // ハンドラの登録.
 xhr.onreadystatechange = function() {
@@ -172,6 +187,13 @@ xhr.onreadystatechange = function() {
             if( xhr.status == 200 || xhr.status == 304 ) {
                 var data = xhr.responseText; // responseXML もあり
                 console.log( 'COMPLETE! :'+data );
+                let json = JSON.parse(data);
+
+                let bson_data = Buffer.from(Base64.decode(json["transaction_bson"]));
+
+                let json_data = bson.deserialize(bson_data);
+                console.log(json_data);
+
             } else {
                 console.log( 'Failed. HttpStatus: '+xhr.statusText );
             }
@@ -179,282 +201,41 @@ xhr.onreadystatechange = function() {
     }
 };
 
-function isArray(obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
-}
-
-const DEFAULT_ID_LEN = 8;
-let date = new Date() ;
-let array = new Array();
-
-class BBcTransaction{
-    constructor(version){
-        this.id_length = DEFAULT_ID_LEN;
-        this.version = version;
-        this.timestamp = (date.getTime() / 1000); //秒単位で記載
-        this.events = [];
-        this.references = [];
-        this.relations = [];
-        this.witness = null;
-        this.cross_ref = null;
-        this.signatures = [];
-        this.userid_sigidx_mapping = {};
-        this.transaction_id = null;
-        this.transaction_base_digest = null;
-        this.transaction_data = null;
-        this.asset_group_ids = {};
-    }
-
-    add_parts(event, reference, relation, witness, cross_ref){
-        //"""Add parts"""
-        if (isArray(event)){
-            if (event.length > 0){
-                for(let i = 0; i < event.length; i++){
-                    this.events =　event;
-                }
+var Base64 = {
+    encode: (function(i, tbl) {
+        for(i=0,tbl={64:61,63:47,62:43}; i<62; i++) {tbl[i]=i<26?i+65:(i<52?i+71:i-4);} //A-Za-z0-9+/=
+        return function(arr) {
+            var len, str, buf;
+            if (!arr || !arr.length) {return "";}
+            for(i=0,len=arr.length,buf=[],str=""; i<len; i+=3) { //6+2,4+4,2+6
+                str += String.fromCharCode(
+                    tbl[arr[i] >>> 2],
+                    tbl[(arr[i]&3)<<4 | arr[i+1]>>>4],
+                    tbl[i+1<len ? (arr[i+1]&15)<<2 | arr[i+2]>>>6 : 64],
+                    tbl[i+2<len ? (arr[i+2]&63) : 64]
+                );
             }
-        }
-
-        if (isArray(reference)){
-            if (reference.length > 0){
-                for(let i = 0; i < reference.length; i++){
-                    this.references =　reference;
-                }
+            return str;
+        };
+    }()),
+    decode: (function(i, tbl) {
+        for(i=0,tbl={61:64,47:63,43:62}; i<62; i++) {tbl[i<26?i+65:(i<52?i+71:i-4)]=i;} //A-Za-z0-9+/=
+        return function(str) {
+            var j, len, arr, buf;
+            if (!str || !str.length) {return [];}
+            for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
+                //for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
+                for(j=0; j<4; j++) {buf[j] = tbl[str.charCodeAt(i+j)||0];}
+                arr.push(
+                    buf[0]<<2|(buf[1]&63)>>>4,
+                    (buf[1]&15)<<4|(buf[2]&63)>>>2,
+                    (buf[2]&3)<<6|buf[3]&63
+                );
             }
-        }
-
-        if (isArray(relation)){
-            if (relation.length > 0){
-                for(let i = 0; i < relation.length; i++){
-                    this.relations =　relation;
-                }
-            }
-        }
-
-        if (witness != null){
-            this.witness = witness;
-        }
-
-        if (cross_ref != null){
-            this.cross_ref = cross_ref;
-        }
-
-        return true;
-    }
-
-    get_sig_index(user_id){
-        if (this.userid_sigidx_mapping[user_id] == null) {
-            this.userid_sigidx_mapping[user_id] = this.userid_sigidx_mapping.length();
-            this.signatures.append(null);
-        }
-        return this.userid_sigidx_mapping[user_id];
-    }
-
-    add_signature(user_id, signature){
-        return true;
-    }
-
-    digest(){
-        let d = "digest"
-        return d;
-    }
-
-    sirialize(){
-        let s= "s";
-        return s;
-    }
-
-    desirialize(data){
-        let d = "d";
-        return d;
-    }
-
-}
-
-let ECDSA_P256v1 = 1;
-let DEFAULT_CURVETYPE =ECDSA_P256v1;
-
-class BBcSignature{
-    constructor(key_type, deserialize){
-        this.key_type = key_type;
-        this.signature = null;
-        this.pubkey = null;
-        this.keypair = null;
-        if (deserialize != null){
-            this.deserialize(deserialize);
-        }
-    }
-
-    add(signature, pubkey){
-        return true;
-    }
-
-    sirialize(){
-        let s= "s";
-        return s;
-    }
-
-    deserialize(data){
-        let d = "d";
-        return d;
-    }
-
-    verify(digest){
-        let flag = false;
-        return flag;
-    }
-
-}
-
-class BBcReference{
-    constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref){
-        this.id_length = DEFAULT_ID_LEN;
-        if (asset_group_id != null) {
-            this.asset_group_id = asset_group_id["id_length"];
-        }else {
-            this.asset_group_id = asset_group_id;
-        }
-
-        this.transaction_id = null;
-        this.transaction = transaction;
-        this.ref_transaction = ref_transaction;
-        this.event_index_in_ref = event_index_in_ref;
-        this.sig_indices = [];
-        this.mandatory_approvers = null;
-        this.option_approvers = null;
-        this.option_sig_ids = [];
-        if (ref_transaction == null) {
-            return ;
-        }
-        this.prepare_reference(ref_transaction);
-    }
-
-    prepare_reference(ref_transaction){
-
-    }
-
-    add_signature(user_id, signature){
-
-    }
-
-    get_referred_transaction(){
-        return {};
-    }
-
-    get_destinations(){
-        return self.mandatory_approvers+self.option_approvers;
-    }
-
-    sirialize(){
-        let s= "s";
-        return s;
-    }
-
-    desirialize(){
-        let d = "d";
-        return d;
-    }
-
-}
-
-function get_random_value(){
-    return "";
+            if (buf[3]===64) {arr.pop();if (buf[2]===64) {arr.pop();}}
+            return arr;
+        };
+    }())
 };
 
-class BBcAsset{
-    constructor(user_id, asset_file, asset_body){
-        this.id_length = DEFAULT_ID_LEN;
-        this.asset_id = null;
-        if (user_id =! null && this.id_length < 32) {
-            this.user_id = user_id["id_length"];
-        }else {
-            this.user_id = user_id;
-        }
 
-        this.nonce = get_random_value();
-        this.asset_file_size = 0;
-        this.asset_file = null;
-        this.asset_file_digest = null;
-        this.asset_body_size = 0;
-        this.asset_body = null;
-        if (user_id =! null) {
-            this.add(user_id, asset_file, asset_body);
-        }}
-
-
-    add(){
-        return true;
-    }
-
-    digest(){
-        return this.asset_id;
-    }
-
-    get_asset_file(){
-
-        return this.asset_file;
-    }
-
-    get_asset_digest(){
-
-        return this.asset_file_digest;
-    }
-
-    recover_asset_file(){
-        return true;
-    }
-
-    serialize(){
-        let data = "aa";
-        return data;
-    }
-
-    deserialize(data){
-        return true;
-    }
-
-}
-
-class BBcWitness{
-    constructor( ){
-        this.id_length = DEFAULT_ID_LEN;
-        this.transaction = null;
-        this.user_ids = [];
-        this.sig_indices = [];
-    }
-
-    add_witness(user_id){
-
-    }
-
-    add_signature(user_id, signature){
-
-    }
-
-    serialize(){
-        let data = "aa";
-        return data;
-    }
-
-    deserialize(data){
-        return true;
-    }
-}
-
-
-
-
-/*
-import BusinessMember from '../lib/BusinessMember';
-
-let pro = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        resolve('ok');
-    }, 500)
-});
-
-pro.then(response => {
-    let user = new BusinessMember('taro', 'yamada', 'G社');
-    console.log(user.getName());
-});
-*/
