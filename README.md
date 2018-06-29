@@ -5,10 +5,10 @@ npx webpack
 
 テスト
 ```$xslt
-npx jest
+karma start
 ```
 
-実行
+ブラウザ上で実行
 ```$xslt
 browser-sync start --server html
 ```
