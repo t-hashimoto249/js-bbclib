@@ -43,11 +43,10 @@ module.exports = function(config) {
         'karma-webpack'
     ],
 
-
     // list of files / patterns to load in the browser
     files: [
-        //'html/js/test.*.js'
         'test/*.js'
+        //'test/transaction_check.test.js'
     ],
 
 

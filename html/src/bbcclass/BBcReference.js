@@ -38,7 +38,7 @@ export default class {
                 this.transaction_id = ref_transaction.digest();
             }
         } catch(e){
-            print(e);
+            //print(e);
         }
 
     }
@@ -74,7 +74,7 @@ export default class {
     }
 
     // TODO: 値がないときにはnullを入れる
-    desirialize(){
+    deserialize(data){
         this.asset_group_id = data['asset_group_id'];
         this.transaction_id = data['transaction_id'];
         this.event_index_in_ref = data['event_index_in_ref'];

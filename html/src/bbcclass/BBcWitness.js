@@ -9,11 +9,19 @@ export default class {
         this.sig_indices = [];
     }
 
+    show_str(){
+        console.log("this.transaction");
+        console.log(this.transaction);
+        console.log("this.user_ids");
+        console.log(this.user_ids);
+        console.log("this.sig_indices");
+        console.log(this.sig_indices);
+    }
+
     add_witness(user_id){
         if(this.user_ids.indexOf(user_id) === -1){
-            //存在しなければ追加
             this.user_ids.push(user_id);
-            this.transaction.get_sig_index(user_id);
+            this.sig_indices.push(this.transaction.get_sig_index(user_id));
         }
     }
 
@@ -39,6 +47,7 @@ export default class {
     }
 
     serialize(){
+
         return {
             'user_ids': this.user_ids,
             'sig_indices': this.sig_indices
@@ -48,10 +57,22 @@ export default class {
     deserialize(json_data){
         this.user_ids = json_data['user_ids'];
         this.sig_indices = json_data['sig_indices'];
-        for (let i = 0; i < this.user_ids.length; i++){
-            //TODO: Transactionを作った後に検証
-            //this.transaction.get_sig_index(this.user_ids[i]);
+        if(this.user_ids.length > 0) {
+            for (let i = 0; i < this.user_ids.length; i++) {
+                this.transaction.get_sig_index(this.user_ids[i]);
+            }
         }
         return true;
+    }
+
+    print_bin(bin){
+        let d = "";
+        for (let i = 0; i < bin.length ; i++){
+            if (bin[i] < 16){
+                d += "0";
+            }
+            d += bin[i].toString(16);
+        }
+        console.log(d);
     }
 }
