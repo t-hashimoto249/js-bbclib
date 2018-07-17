@@ -1,9 +1,9 @@
 'use strict';
 
 import buffer from 'buffer';
-//import jscu from 'js-crypto-utils';
-import { BBcTransaction } from "../src/bbcclass/BBcTransaction";
-import { BBcWitness } from "../src/bbcclass/BBcWitness";
+import { BBcTransaction } from "./bbcclass/BBcTransaction";
+import { BBcWitness } from "./bbcclass/BBcWitness";
+import * as para from 'bbcclass/Parameter.js';
 
 const Buffer = buffer.Buffer;
 
@@ -14,6 +14,7 @@ var $ = require('jquery');
 var global;
 var xhr = new XMLHttpRequest();
 
+let ip = "192.168.11.45";
 
 $(document).ready(function () {
     console.log("start"); // コンソール出力
@@ -27,7 +28,7 @@ $(document).ready(function () {
     // set1ボタンクリックで各変数に1を代入
     $("#domain_setup").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/domain_setup', false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/domain_setup', false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
 
@@ -42,7 +43,7 @@ $(document).ready(function () {
         console.log("sendMessage"); // コンソール出力
 
         let transaction = BBcTransaction();
-        xhr.open( 'POST', 'http://127.0.0.1:3000/insert_transaction/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
 
@@ -58,7 +59,7 @@ $(document).ready(function () {
 
     $("#search_transaction").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/search_transaction/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/search_transaction/' + domain, false );
 
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
@@ -74,7 +75,7 @@ $(document).ready(function () {
 
     $("#insert_transactions_and_traverse").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/insert_transaction/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let bsonobj = "aaa";
@@ -89,7 +90,7 @@ $(document).ready(function () {
 
     $("#traverse").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/traverse_transactions/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let parameter = {
@@ -105,7 +106,7 @@ $(document).ready(function () {
 
     $("#traverse_reserve").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/traverse_transactions/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let parameter = {
@@ -120,7 +121,7 @@ $(document).ready(function () {
 
     $("#traverse_not_found").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/traverse_transactions/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let parameter = {
@@ -137,7 +138,7 @@ $(document).ready(function () {
 
     $("#traverse").click(function(){
         console.log("sendMessage"); // コンソール出力
-        xhr.open( 'POST', 'http://127.0.0.1:3000/traverse_transactions/' + domain, false );
+        xhr.open( 'POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false );
         // POST 送信の場合は Content-Type は固定.
         xhr.setRequestHeader( 'Content-Type', 'application/json' );
         let parameter = {
@@ -189,7 +190,7 @@ xhr.onreadystatechange = function() {
                 console.log( 'COMPLETE! :'+data );
                 let json = JSON.parse(data);
 
-                let bson_data = Buffer.from(Base64.decode(json["transaction_bson"]));
+                let bson_data = Buffer.from(para.Base64.decode(json["transaction_bson"]));
 
                 let json_data = bson.deserialize(bson_data);
                 console.log(json_data);
@@ -200,42 +201,3 @@ xhr.onreadystatechange = function() {
             break;
     }
 };
-
-var Base64 = {
-    encode: (function(i, tbl) {
-        for(i=0,tbl={64:61,63:47,62:43}; i<62; i++) {tbl[i]=i<26?i+65:(i<52?i+71:i-4);} //A-Za-z0-9+/=
-        return function(arr) {
-            var len, str, buf;
-            if (!arr || !arr.length) {return "";}
-            for(i=0,len=arr.length,buf=[],str=""; i<len; i+=3) { //6+2,4+4,2+6
-                str += String.fromCharCode(
-                    tbl[arr[i] >>> 2],
-                    tbl[(arr[i]&3)<<4 | arr[i+1]>>>4],
-                    tbl[i+1<len ? (arr[i+1]&15)<<2 | arr[i+2]>>>6 : 64],
-                    tbl[i+2<len ? (arr[i+2]&63) : 64]
-                );
-            }
-            return str;
-        };
-    }()),
-    decode: (function(i, tbl) {
-        for(i=0,tbl={61:64,47:63,43:62}; i<62; i++) {tbl[i<26?i+65:(i<52?i+71:i-4)]=i;} //A-Za-z0-9+/=
-        return function(str) {
-            var j, len, arr, buf;
-            if (!str || !str.length) {return [];}
-            for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                //for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                for(j=0; j<4; j++) {buf[j] = tbl[str.charCodeAt(i+j)||0];}
-                arr.push(
-                    buf[0]<<2|(buf[1]&63)>>>4,
-                    (buf[1]&15)<<4|(buf[2]&63)>>>2,
-                    (buf[2]&3)<<6|buf[3]&63
-                );
-            }
-            if (buf[3]===64) {arr.pop();if (buf[2]===64) {arr.pop();}}
-            return arr;
-        };
-    }())
-};
-
-

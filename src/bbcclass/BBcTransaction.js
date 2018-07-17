@@ -4,36 +4,20 @@ import BBcReference from './BBcReference.js';
 import BBcSignature from './BBcSignature.js';
 import BBcRelation from './BBcRelation.js';
 import BBcEvent from './BBcEvent.js';
+import BBcCrossRef from './BBcCrossRef';
 import KeyPair from "./KeyPair.js";
+import * as para from './Parameter.js';
 
-
-var BSON = require('bson');
+let BSON = require('bson');
 let bson = new BSON();
 
 let date = new Date() ;
 
-var BBcFormat = {
-    FORMAT_BINARY : 0,
-    FORMAT_BSON : 1,
-    FORMAT_BSON_COMPRESS_BZ2 : 2
-};
-
-var DefaultLength ={
-    BBcSimple : 8,
-    BBcOne: 32
-};
-
-const KeyType = {
-    NOT_INITIALIZED: 0,
-    ECDSA_SECP256k1: 1,
-    ECDSA_P256v1: 2
-};
-
 export default class {
 
     constructor(version){
-        this.format_type = BBcFormat.FORMAT_BSON;
-        this.id_length = DefaultLength.BBcSimple;
+        this.format_type = para.BBcFormat.FORMAT_BSON;
+        this.id_length = para.DefaultLength.BBcSimple;
         this.version = version;
         this.timestamp = Math.floor(date.getTime() / 1000); //秒単位で記載
         this.events = [];
@@ -52,7 +36,6 @@ export default class {
 
     show_str(){
         console.log("show_str");
-
         console.log("format_type");
         console.log(this.format_type);
         console.log("id_length");
@@ -64,7 +47,7 @@ export default class {
         if(this.events != null && this.events.length > 0){
             console.log("events");
             for (let i = 0; i < this.events.length; i++){
-                console.log(this.events[i].showEvent());
+                console.log(this.events[i].show_event());
             }
         }
         console.log("references");
@@ -86,18 +69,16 @@ export default class {
         if(this.signatures != null && this.signatures.length > 0){
             console.log("signatures length");
             console.log(this.signatures.length);
-            console.log(this.signatures[0].showSig());
+            console.log(this.signatures[0].show_sig());
         }else{
             console.log(this.signatures);
         }
         console.log("userid_sigidx_mapping");
         console.log(this.userid_sigidx_mapping);
         console.log("transaction_id");
-        //this.print_bin(this.transaction_id);
         console.log(this.transaction_id);
         console.log("transaction_base_digest");
         console.log(this.transaction_base_digest);
-        //this.print_bin(this.transaction_base_digest);
         console.log("transaction_data");
         console.log(this.transaction_data);
         console.log("asset_group_ids");
@@ -105,7 +86,6 @@ export default class {
     }
 
     add_parts(event, reference, relation, witness, cross_ref){
-        //"""Add parts"""
         if (Array.isArray(event)){
             if (event.length > 0){
                 for(let i = 0; i < event.length; i++){
@@ -154,12 +134,37 @@ export default class {
         }
     }
 
-    get_sig_index(user_id){
+    add_reference(reference){
+        if (Array.isArray(reference)){
+            if (reference.length > 0){
+                for(let i = 0; i < reference.length; i++){
+                    this.references =　reference;
+                }
+            }
+        }
+    }
 
+    add_relation(relation){
+        if (Array.isArray(relation)){
+            if (relation.length > 0){
+                for(let i = 0; i < relation.length; i++){
+                    this.relations =　relation;
+                }
+            }
+        }
+    }
+
+    add_cross_ref(cross_ref){
+        if (cross_ref != null){
+            this.cross_ref = cross_ref;
+        }
+    }
+
+    get_sig_index(user_id){
         if (this.userid_sigidx_mapping[user_id] == null) {
             let sig_index_obj = Object.keys(this.userid_sigidx_mapping);
             this.userid_sigidx_mapping[user_id] = sig_index_obj.length;
-            this.signatures.push(new BBcSignature(KeyType.ECDSA_P256v1));
+            this.signatures.push(new BBcSignature(para.KeyType.ECDSA_P256v1));
         }
         return this.userid_sigidx_mapping[user_id];
     }
@@ -186,17 +191,6 @@ export default class {
         return this.transaction_id;
     }
 
-    print_bin(bin){
-        let d = "";
-        for (let i = 0; i < bin.length ; i++){
-            if (bin[i] < 16){
-                d += "0";
-            }
-            d += bin[i].toString(16);
-        }
-        console.log(d);
-    }
-
     async serialize(for_id, no_header){
         let witness = null;
         if (this.witness != null){
@@ -205,9 +199,7 @@ export default class {
         let event_list = [];
         for (let i = 0; i < this.events.length; i++){
             event_list.push(this.events[i].serialize());
-            console.log("Event Serialize");
-            this.events[i].showEvent();
-            print_bin(this.events[i].serialize());
+            para.print_bin(this.events[i].serialize());
 
         }
         let ref_list = [];
@@ -218,9 +210,9 @@ export default class {
         for (let i = 0; i < this.relations.length; i++){
             relation_list.push(this.relations[i].serialize());
         }
-        let tx_crossref = null;
+        let tx_cross_ref = null;
         if(this.cross_ref != null){
-            tx_crossref = this.cross_ref.serialize();
+            tx_cross_ref = this.cross_ref.serialize();
         }
 
         let tx_base = {
@@ -240,17 +232,17 @@ export default class {
             cross_ref = this.cross_ref.serialize();
         }
 
-        let target = bson.serialize(tx_base);
+        let target = bson.serialize(tx_base,{});
         this.transaction_base_digest = new Buffer(await jscu.crypto.hash.getHash('SHA-256', target));
 
         if (for_id === true){
             return bson.serialize({
                 "tx_base": this.transaction_base_digest,
                 "cross_ref": cross_ref
-            });
+            },{});
         }
 
-        tx_base["cross_ref"] = tx_crossref;
+        tx_base["cross_ref"] = tx_cross_ref;
 
         let signature_list = [];
         for (let i = 0; i < this.signatures.length; i++){
@@ -260,7 +252,7 @@ export default class {
         let dat = bson.serialize({
             "transaction_base": tx_base,
             "signatures": signature_list
-        });
+        },{});
 
         if (no_header === true) {
             return dat;
@@ -278,8 +270,8 @@ export default class {
     }
 
     async deserialize(data){
-        let bsondata = bson.deserialize(data);
-        let tx_base = bsondata["transaction_base"];
+        let bson_data = bson.deserialize(data,{});
+        let tx_base = bson_data["transaction_base"];
         this.version = tx_base["header"]["version"];
         this.timestamp = tx_base["header"]["timestamp"];
         this.id_length = tx_base["header"]["id_length"];
@@ -327,10 +319,10 @@ export default class {
         }
 
         this.signatures = [];
-        if (bsondata["signatures"]){
-            for (let i = 0 ; i < bsondata["signatures"].length ; i++){
+        if (bson_data["signatures"]){
+            for (let i = 0 ; i < bson_data["signatures"].length ; i++){
                 let sig = new BBcSignature(2);
-                await sig.deserialize( bsondata["signatures"][i]);
+                await sig.deserialize( bson_data["signatures"][i]);
                 this.signatures.push(sig);
             }
         }
@@ -339,93 +331,32 @@ export default class {
         return true;
     }
 
-    async sign(private_key, public_key, keypair){
+    async sign(private_key, public_key, key_pair){
 
-        if (keypair == null){
-            if (private_key.length != 32 || public_key.length <= 32) {
+        if (key_pair == null){
+            if (private_key.length !== 32 || public_key.length <= 32) {
 
                 return null;
             }
 
-            keypair = new KeyPair();
-            keypair.setKeyPair(private_key, public_key);
-            if (keypair == null){
+            key_pair = new KeyPair();
+            key_pair.set_key_pair(private_key, public_key);
+            if (key_pair == null){
 
                 return null;
             }
         }
 
-        let sig = new BBcSignature(2);
-        let s = await keypair.sign( await this.digest());
+        let sig = new BBcSignature(para.KeyType.ECDSA_P256v1);
+        let s = await key_pair.sign( await this.digest());
         if (s == null) {
             return null;
         }
 
-        await sig.add(s, keypair.public_key);
+        await sig.add(s, key_pair.public_key);
         return sig
     }
 
 }
 
-var Base64 = {
-    encode: (function(i, tbl) {
-        for(i=0,tbl={64:61,63:47,62:43}; i<62; i++) {tbl[i]=i<26?i+65:(i<52?i+71:i-4);} //A-Za-z0-9+/=
-        return function(arr) {
-            var len, str, buf;
-            if (!arr || !arr.length) {return "";}
-            for(i=0,len=arr.length,buf=[],str=""; i<len; i+=3) { //6+2,4+4,2+6
-                str += String.fromCharCode(
-                    tbl[arr[i] >>> 2],
-                    tbl[(arr[i]&3)<<4 | arr[i+1]>>>4],
-                    tbl[i+1<len ? (arr[i+1]&15)<<2 | arr[i+2]>>>6 : 64],
-                    tbl[i+2<len ? (arr[i+2]&63) : 64]
-                );
-            }
-            return str;
-        };
-    }()),
-    decode: (function(i, tbl) {
-        for(i=0,tbl={61:64,47:63,43:62}; i<62; i++) {tbl[i<26?i+65:(i<52?i+71:i-4)]=i;} //A-Za-z0-9+/=
-        return function(str) {
-            var j, len, arr, buf;
-            if (!str || !str.length) {return [];}
-            for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                //for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                for(j=0; j<4; j++) {buf[j] = tbl[str.charCodeAt(i+j)||0];}
-                arr.push(
-                    buf[0]<<2|(buf[1]&63)>>>4,
-                    (buf[1]&15)<<4|(buf[2]&63)>>>2,
-                    (buf[2]&3)<<6|buf[3]&63
-                );
-            }
-            if (buf[3]===64) {arr.pop();if (buf[2]===64) {arr.pop();}}
-            return arr;
-        };
-    }())
-};
-
-async function create_pubkey_byte(pubkey){
-    let byte_x = await jscu.helper.encoder.decodeBase64Url(pubkey['x']);
-    let byte_y = await jscu.helper.encoder.decodeBase64Url(pubkey['y']);
-
-    let pubkey_byte = new Buffer(65);
-    pubkey_byte[0]= 0x04;
-    for(let i = 0; i < 32; i++){
-        pubkey_byte[i+1] = byte_x[i];
-        pubkey_byte[i+1+32] = byte_y[i];
-    }
-
-    return pubkey_byte;
-}
-
-function print_bin(bin){
-    let d = "";
-    for (let i = 0; i < bin.length ; i++){
-        if (bin[i] < 16){
-            d += "0";
-        }
-        d += bin[i].toString(16);
-    }
-    console.log(d);
-}
 

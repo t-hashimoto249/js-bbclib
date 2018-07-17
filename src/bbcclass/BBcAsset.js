@@ -1,24 +1,25 @@
-const DEFAULT_ID_LEN = 8;
 import jscu from "js-crypto-utils";
+import * as para from './Parameter.js';
 
-var BSON = require('bson');
+
+let BSON = require('bson');
 let bson = new BSON();
 
 export default class {
     constructor(user_id){
-        this.id_length = DEFAULT_ID_LEN;
+        this.id_length = para.DefaultLength.BBcSimple;
         this.user_id = user_id; // byte
-        this.asset_id = null;
+        this.asset_id = null; // byte
         this.nonce = null; // byte
-        this.asset_file_size = 0;
-        this.asset_file = null;
-        this.asset_file_digest = null;
-        this.asset_body_size = 0;
+        this.asset_file_size = 0; // int
+        this.asset_file = null; //byte
+        this.asset_file_digest = null; //byte
+        this.asset_body_size = 0; //int
         this.asset_body = null; // byte
 
     }
 
-    showAsset(){
+    show_asset(){
         console.log("---------showAsset--------");
         if (this.asset_id != null){
             console.log("this.asset_id");
@@ -42,11 +43,11 @@ export default class {
 
     }
 
-    async setRandomNonce(){
-        this.nonce = await get_random_value(32);
+    async set_random_nonce(){
+        this.nonce = await para.get_random_value(32);
     }
 
-    setNonce(nonce){
+    set_nonce(nonce){
         this.nonce = nonce;
     }
 
@@ -98,18 +99,14 @@ export default class {
         return this.asset_file_digest;
     }
 
-    async check_asset_file(asset_file, id_length){
+    async check_asset_file(asset_file){
         let digest = await jscu.crypto.hash.getHash('SHA-256', asset_file);
-        if(digest === this.asset_file_digest){
-            return true;
-        }else{
-            return false;
-        }
+        return (digest === this.asset_file_digest);
     }
 
     serialize(for_digest_calculation){
 
-        if (for_digest_calculation == true){
+        if (for_digest_calculation === true){
             return bson.serialize({
                 'user_id': this.user_id,
                 'nonce': this.nonce,
@@ -117,7 +114,7 @@ export default class {
                 'asset_file_digest': this.asset_file_digest,
                 'asset_body_size': this.asset_body_size,
                 'asset_body': this.asset_body
-            })
+            },{})
 
         }else{
             return {
@@ -132,7 +129,6 @@ export default class {
         }
     }
 
-    // TODO: もし値がないときにnullなどを入れる。という処理を入れる
     deserialize(data){
         this.asset_id = data['asset_id'];
         this.user_id = data['user_id'];
@@ -156,9 +152,4 @@ export default class {
     }
 }
 
-async function get_random_value(num){
-    const msg = await jscu.crypto.random.getRandomBytes(num);
-    const digest = await jscu.crypto.hash.getHash('SHA-256', msg);
-    return digest;
-};
 

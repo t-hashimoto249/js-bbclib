@@ -1,10 +1,9 @@
-const DEFAULT_ID_LEN = 8;
+import * as para from './Parameter.js';
 
 export default class {
     constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref){
-        this.id_length = DEFAULT_ID_LEN;
+        this.id_length = para.DefaultLength.BBcSimple;
         this.asset_group_id = asset_group_id;
-
         this.transaction_id = null;
         this.transaction = transaction;
         this.ref_transaction = ref_transaction;
@@ -25,12 +24,11 @@ export default class {
 
             let evt = ref_transaction.events[this.event_index_in_ref];
             for (let i = 0; i < evt.mandatory_approvers.length(); i++){
-                this.sig_indices.append(self.transaction.get_sig_index( evt.mandatory_approvers[i] ))
+                this.sig_indices.append(this.transaction.get_sig_index( evt.mandatory_approvers[i] ))
             }
 
-            // TODO: 動くかどうかわからん
             for (let i = 0; i < evt.option_approver_num_numerator.length(); i++){
-                let dummy_id = get_random_value(4);
+                let dummy_id = para.get_random_value(4);
                 this.option_sig_ids.append(dummy_id);
                 this.sig_indices.append(this.transaction.get_sig_index(dummy_id));
                 this.mandatory_approvers = evt.mandatory_approvers;
@@ -44,8 +42,8 @@ export default class {
     }
 
     add_signature(user_id, signature){
-        if (user_id == true){
-            if (this.option_sig_ids.length == 0){
+        if (user_id === true){
+            if (this.option_sig_ids.length === 0){
                 return;
             }
             // TODO: ここの動作をきく
@@ -56,7 +54,6 @@ export default class {
     }
 
     get_referred_transaction(){
-        let key = this.ref_transaction.transaction_id;
         return {key: this.ref_transaction.serialize()};
     }
 
@@ -73,7 +70,6 @@ export default class {
         };
     }
 
-    // TODO: 値がないときにはnullを入れる
     deserialize(data){
         this.asset_group_id = data['asset_group_id'];
         this.transaction_id = data['transaction_id'];

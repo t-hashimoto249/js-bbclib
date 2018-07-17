@@ -1,12 +1,8 @@
-
-var DefaultLength ={
-    BBcSimple : 8,
-    BBcOne: 32
-};
+import * as para from './Parameter.js';
 
 export default class {
     constructor(transaction_id, asset_id){
-        this.id_length = DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcSimple;
         if (transaction_id != null){
             this.transaction_id = transaction_id;
         }else{
@@ -21,7 +17,7 @@ export default class {
 
     }
 
-    showPointer(){
+    show_pointer(){
         console.log("transaction_id");
         console.log(this.transaction_id);
         console.log("asset_id");

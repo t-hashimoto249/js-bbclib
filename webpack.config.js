@@ -36,18 +36,20 @@ const webConfig = {
     target: 'web',
     entry:
         {
-            'babel-polyfill': ['./html/src/index.js'],
+            //'bbclib': ['./src/bbcclass/*'],
             //'babel-polyfill': ['./html/src/*.js', './html/src/*/*.js'],
             //auth: ['./src/index.mjs'],
-            'test.bbclib': ['./test/bbclib.test.js']
-            //'test.validate': ['./test/api.validate.spec.mjs'],
+            //'test.bbclib': ['./test/bbclib.test.js'],
+            //'test.connection': ['./test/transaction_check.test.js'],
+            'test.test': ['./test/test_bbclib.js'],
+            'test.test2': ['./test/test_connection_bbcapp_and_bbccore.test.js']
             //'test.register': ['./test/api.register.spec.mjs'],
             //'test.refresh': ['./test/api.refresh.spec.mjs']
             // testはcommon-js記法だと動かないのでここでwebpack & babelしてしまう。
             // @babel/polyfill はIE11で動かないときなどで必要, libを作るときはGlobalが汚染されるのでこれを読み込むlibやhtmlの方でpolyfillを呼ぶこと。
         },
     output: {
-        path: `${__dirname}/html/js`,
+        path: `${__dirname}/dist`,
         //filename: 'main.js'
         filename: '[name].bundle.js',
         chunkFilename: '[name].js',
@@ -83,8 +85,10 @@ const webConfig = {
         'crypto': true,
         'mkdirp': true,
         'jscu': true,
-
-        'buffer': true
+        'buffer': true,
+        'cbytes': true,
+        'assertArrays': true,
+        'cjson': true
 
     }],
     plugins:[
@@ -107,7 +111,7 @@ module.exports = (env, argv) => {
     const config = webConfig;
     if (argv.mode === 'development'){
         console.log('build for development');
-        config.devtool = 'source-map'; // add inline source map
+        config.devtool = 'inline-source-map'; // add inline source map
     }
     else if(argv.mode === 'production'){
         console.log('build for production');

@@ -1,9 +1,9 @@
-const DEFAULT_ID_LEN = 8;
+import * as para from './Parameter.js';
 
 //export class BBcWitness{
 export default class {
     constructor( ){
-        this.id_length = DEFAULT_ID_LEN;
+        this.id_length = para.DefaultLength.BBcSimple;
         this.transaction = null;
         this.user_ids = [];
         this.sig_indices = [];
@@ -26,8 +26,7 @@ export default class {
     }
 
     add_signature(user_id, signature){
-        //TODO: Transactionを作った後に検証
-        //this.transaction.add_signature(user_id, signature);
+        this.transaction.add_signature(user_id, signature);
     }
 
     add_user(user){
@@ -38,16 +37,15 @@ export default class {
         return false;
     }
 
-    add_sig_indices(indice){
-        if(indice != null){
-            this.sig_indices.push(indice);
+    add_sig_indices(index){
+        if(index != null){
+            this.sig_indices.push(index);
             return true;
         }
         return false;
     }
 
     serialize(){
-
         return {
             'user_ids': this.user_ids,
             'sig_indices': this.sig_indices
@@ -65,14 +63,4 @@ export default class {
         return true;
     }
 
-    print_bin(bin){
-        let d = "";
-        for (let i = 0; i < bin.length ; i++){
-            if (bin[i] < 16){
-                d += "0";
-            }
-            d += bin[i].toString(16);
-        }
-        console.log(d);
-    }
 }

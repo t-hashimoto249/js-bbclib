@@ -1,16 +1,10 @@
 import BBcAsset from './BBcAsset.js';
 import BBcPointer from './BBcPointer.js';
-
-
-var DefaultLength ={
-    BBcSimple : 8,
-    BBcOne: 32
-};
+import * as para from './Parameter.js';
 
 export default class {
     constructor(asset_group_id){
-        console.log("constructorRelations");
-        this.id_length = DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcSimple;
         if (asset_group_id != null ){
             this.asset_group_id = asset_group_id;
         }else{
@@ -21,7 +15,7 @@ export default class {
         this.asset = null;
     }
 
-    showRelation(){
+    show_relation(){
         console.log("asset_group_id");
         console.log(this.asset_group_id);
         if( this.pointers.length > 0){
@@ -33,7 +27,7 @@ export default class {
 
         if(this.asset != null){
             console.log("asset");
-            this.asset.showAsset();
+            this.asset.show_asset();
         }
     }
 

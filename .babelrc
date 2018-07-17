@@ -9,9 +9,8 @@
     } ]
   ],
   "ignore": [ "node_modules" ],
-  "only": [ "html/src/bbcclass", "test" ],
+  "only": [ "src/bbcclass", "test" ],
   "plugins": [
-    "babel-plugin-dynamic-import-node-sync",
     "@babel/plugin-syntax-dynamic-import",
     [
       "@babel/plugin-transform-runtime",

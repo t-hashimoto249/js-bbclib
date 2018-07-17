@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+<head>
+    <meta charset="UTF-8">
+
+    <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
+
+    <!-- node_modules以下からdistへ生成されたbabel-polyfillのsymlink -->
+    <script src="node_modules/@babel/polyfill/browser.js"></script>
+
+    <!-- IEのfetch API対応 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/3.2.2/es6-promise.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
+
+    <title>ES6のテスト</title>
+</head>
+<body>
+    <div id="mocha"></div>
+    <script src ="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+
+    <!-- <script src="dist/test.bbclib.bundle.js"></script> -->
+    <!-- <script src="dist/test.connection.bundle.js"></script> -->
+    <script src="dist/test.test.bundle.js"></script>
+    <script src="dist/test.test2.bundle.js"></script>
+
+    <script>mocha.run();</script>
+
+</body>
+</html>

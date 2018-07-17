@@ -1,13 +1,9 @@
 import BBcAsset from './BBcAsset.js';
-var DefaultLength ={
-    BBcSimple : 8,
-    BBcOne: 32
-};
-
+import * as para from './Parameter.js';
 
 export default class {
     constructor( asset_group_id){
-        this.id_length = DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcSimple;
         this.asset_group_id = asset_group_id;
         this.reference_indices = [];
         this.mandatory_approvers = [];
@@ -17,7 +13,7 @@ export default class {
         this.asset = null;
     }
 
-    showEvent(){
+    show_event(){
         console.log("------show_event-------");
 
         console.log("id_length");
@@ -36,7 +32,7 @@ export default class {
         console.log(this.option_approvers);
         if(this.asset != null){
             console.log("this.asset");
-            this.asset.showAsset();
+            this.asset.show_asset();
         }
         console.log("------show_event end-------");
     }
@@ -86,7 +82,6 @@ export default class {
     }
 
     deserialize(data){
-
         this.asset_group_id = data['asset_group_id'];
         this.reference_indices = data['reference_indices'];
         this.mandatory_approvers = data['mandatory_approvers'];

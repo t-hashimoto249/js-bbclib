@@ -11,7 +11,6 @@ const getWebpackConfig = () => {
     delete config.output;
     delete config.plugins;
 
-
     config.module.rules = config.module.rules.map( (elem) => {
         if(elem.use[0].loader === 'babel-loader'){
             elem.use[0].options.plugins.push(...babelExtraPlugins);
@@ -45,8 +44,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        'test/*.js'
-        //'test/transaction_check.test.js'
+        //'test/*.js'
+        'test/test_connection_bbcapp_and_bbccore.test.js'
+        //'test/test_bbclib.js'
     ],
 
 
