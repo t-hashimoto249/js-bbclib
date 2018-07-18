@@ -1,5 +1,6 @@
 import jscu from "js-crypto-utils";
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
+import * as helper from '../helper.js';
 
 
 let BSON = require('bson');
@@ -23,7 +24,7 @@ export default class {
         console.log("---------showAsset--------");
         if (this.asset_id != null){
             console.log("this.asset_id");
-            this.print_bin(this.asset_id);
+            helper.print_bin(this.asset_id);
         }
         console.log("this.user_id");
         console.log(this.user_id);
@@ -44,7 +45,7 @@ export default class {
     }
 
     async set_random_nonce(){
-        this.nonce = await para.get_random_value(32);
+        this.nonce = await helper.get_random_value(32);
     }
 
     set_nonce(nonce){
@@ -58,7 +59,6 @@ export default class {
     }
 
     async add_asset( asset_file, asset_body){
-        //"""Add parts in this object"""
         if(asset_file !== null) {
             this.asset_file = asset_file;
             this.asset_file_size = asset_file.length;
@@ -138,17 +138,6 @@ export default class {
         this.asset_body_size = data['asset_body_size'];
         this.asset_body = data['asset_body'];
         return true;
-    }
-
-    print_bin(bin){
-        let d = "";
-        for (let i = 0; i < bin.length ; i++){
-            if (bin[i] < 16){
-                d += "0";
-            }
-            d += bin[i].toString(16);
-        }
-        console.log(d);
     }
 }
 

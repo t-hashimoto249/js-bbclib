@@ -6,7 +6,7 @@ import BBcReference from '../src/bbcclass/BBcReference.js';
 import BBcSignature from '../src/bbcclass/BBcSignature.js';
 import BBcEvent from '../src/bbcclass/BBcEvent.js';
 import KeyPair from '../src/bbcclass/KeyPair.js';
-import * as para from '../src/bbcclass/Parameter.js'
+import * as para from '../src/parameter.js'
 import * as help from '../src/helper.js'
 import jscu from "js-crypto-utils";
 
@@ -66,9 +66,10 @@ describe('test', async () => {
         let tx = await help.make_transaction(new Buffer(user1, "hex"), keypair, 0, 0, true);
         let bsonobj = await tx.serialize(false, true);
 
+        console.log("1-----------");
         console.log(bsonobj);
         tx.show_str();
-
+        console.log("2-----------");
         let parameter = {
             'source_user_id': user1,
             'transaction_bson': help.Base64.encode(bsonobj)
@@ -85,7 +86,6 @@ describe('test', async () => {
         xhr.abort();
 
     });
-
 
     it('Test insert transaction with event', async function () {
 
@@ -113,6 +113,46 @@ describe('test', async () => {
         xhr.abort();
 
     });
+
+    it('Test search_transaction_with_condition', async function () {
+
+        console.log("***********************");
+        console.log("Test Rest API for insert_transaction with event"); // コンソール出力
+
+
+
+    });
+
+    it('Test traverse_transactions', async function () {
+
+        console.log("***********************");
+        console.log("Test traverse_transactions"); // コンソール出力
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        let tx = await help.make_transaction(new Buffer(user1, "hex"), keypair, 1, 0, true);
+        let parameter = {
+            'source_user_id': user1,
+            'transaction_id': transaction_id1,
+            'user_id': user1,
+            'direction': 0,
+            'hop_count': 2
+        };
+
+        xhr.addEventListener("load", function (event) {
+            console.log( 'COMPLETE! traverse_transactions:' );
+            console.log(event.target.status);
+            console.log(event.target.responseText); // => "{...}"
+            expect(200).to.be.eq(event.target.status); // => 200
+        });
+
+        xhr.send(JSON.stringify(parameter));
+        xhr.abort();
+
+    });
+
 
 
     /*

@@ -1,6 +1,5 @@
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
 
-//export class BBcWitness{
 export default class {
     constructor( ){
         this.id_length = para.DefaultLength.BBcSimple;

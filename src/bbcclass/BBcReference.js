@@ -1,4 +1,5 @@
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
+import * as helper from '../helper.js';
 
 export default class {
     constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref){
@@ -28,7 +29,7 @@ export default class {
             }
 
             for (let i = 0; i < evt.option_approver_num_numerator.length(); i++){
-                let dummy_id = para.get_random_value(4);
+                let dummy_id = helper.get_random_value(4);
                 this.option_sig_ids.append(dummy_id);
                 this.sig_indices.append(this.transaction.get_sig_index(dummy_id));
                 this.mandatory_approvers = evt.mandatory_approvers;

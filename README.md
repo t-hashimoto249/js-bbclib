@@ -1,22 +1,15 @@
-コンパイル
-```
-npx webpack
-```
-
-テスト
-```$xslt
-karma start
-```
-
-ブラウザ上で実行
-```$xslt
-browser-sync start --server html
-```
-
-
-確認はjavascript debugで確認
+Javascript library for BBc-1 (Beyond Blockchain One). 
 
 このライブラリはブロックチェーンのプラットフォームであるbbc-1をブラウザ上のJSもしくはpureJS上で利用するためのライブラリです。
+The library provide 
+serialize, deserialize function for 
+
+
+The library can work on some browser and Node.js.  
+
+The 
+block chaion one 
+
 対応しているブラウザは、Google Chrome、Safari、FireFox、Edge、Internet Explorerです。
 BBc-1: https://github.com/beyond-blockchain/bbc1
 このライブラリでは、bbc-1プラットフォーム上で定義されているTransaction、Event、Asset、Reference、Relation、Signature、Witness、CrossRef、Pointer、KeyPairクラスで必要となる機能を提供します。
@@ -24,7 +17,8 @@ BBc-1: https://github.com/beyond-blockchain/bbc1
 このモジュールはES6で書かれています。
 
 
-インストール方法
+Usage
+
 
 
 使い方

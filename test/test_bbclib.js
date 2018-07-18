@@ -10,7 +10,7 @@ import BBcSignature from "../src/bbcclass/BBcSignature.js";
 import BBcRelation from "../src/bbcclass/BBcRelation.js";
 import BBcCrossRef from "../src/bbcclass/BBcCrossRef.js";
 import BBcPointer from "../src/bbcclass/BBcPointer.js";
-import * as para from "../src/bbcclass/Parameter.js"
+import * as para from "../src/parameter.js"
 
 const expect = chai.expect;
 

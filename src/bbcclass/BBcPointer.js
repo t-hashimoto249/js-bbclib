@@ -1,4 +1,4 @@
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
 
 export default class {
     constructor(transaction_id, asset_id){

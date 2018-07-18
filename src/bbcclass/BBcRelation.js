@@ -1,6 +1,6 @@
 import BBcAsset from './BBcAsset.js';
 import BBcPointer from './BBcPointer.js';
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
 
 export default class {
     constructor(asset_group_id){

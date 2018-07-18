@@ -6,7 +6,7 @@ import BBcRelation from './BBcRelation.js';
 import BBcEvent from './BBcEvent.js';
 import BBcCrossRef from './BBcCrossRef';
 import KeyPair from "./KeyPair.js";
-import * as para from './Parameter.js';
+import * as para from '../parameter.js';
 
 let BSON = require('bson');
 let bson = new BSON();
@@ -199,8 +199,6 @@ export default class {
         let event_list = [];
         for (let i = 0; i < this.events.length; i++){
             event_list.push(this.events[i].serialize());
-            para.print_bin(this.events[i].serialize());
-
         }
         let ref_list = [];
         for (let i = 0; i < this.references.length; i++){

@@ -1,7 +1,6 @@
 import KeyPair from "./KeyPair.js";
 import jscu from "js-crypto-utils";
-import * as para from './Parameter.js';
-
+import * as helper from '../helper.js';
 
 export default class {
     constructor(key_type){
@@ -18,11 +17,11 @@ export default class {
         console.log("key_type");
         console.log(this.key_type);
         console.log("signature");
-        para.print_bin(this.signature);
+        helper.print_bin(this.signature);
         console.log("pubkey");
         console.log(this.pubkey);
         console.log("pubkey_byte");
-        para.print_bin(this.pubkey_byte);
+        helper.print_bin(this.pubkey_byte);
         console.log("keypair");
         console.log(this.keypair);
         console.log("not_initialized");
@@ -37,7 +36,7 @@ export default class {
 
         if (pub_key != null){
             this.pubkey = pub_key;
-            this.pubkey_byte = await para.create_pubkey_byte(pub_key);
+            this.pubkey_byte = await helper.create_pubkey_byte(pub_key);
             this.keypair = new KeyPair();
             this.keypair.set_key_pair(null, pub_key);
         }
