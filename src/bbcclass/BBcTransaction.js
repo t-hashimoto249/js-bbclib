@@ -331,7 +331,7 @@ export default class {
 
     async sign(private_key, public_key, key_pair){
 
-        if (key_pair == null){
+        if (key_pair === null){
             if (private_key.length !== 32 || public_key.length <= 32) {
 
                 return null;
@@ -347,7 +347,7 @@ export default class {
 
         let sig = new BBcSignature(para.KeyType.ECDSA_P256v1);
         let s = await key_pair.sign( await this.digest());
-        if (s == null) {
+        if (s === null) {
             return null;
         }
 

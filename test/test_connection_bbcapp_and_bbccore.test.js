@@ -7,15 +7,14 @@ import BBcSignature from '../src/bbcclass/BBcSignature.js';
 import BBcEvent from '../src/bbcclass/BBcEvent.js';
 import KeyPair from '../src/bbcclass/KeyPair.js';
 import * as para from '../src/parameter.js'
-import * as help from '../src/helper.js'
+import * as helper from '../src/helper.js'
 import jscu from "js-crypto-utils";
 
 const expect = chai.expect;
 
-
 let domain = '67d1650916d9b6f67b130960c10e43f04a012042cc44aff966aa763cc38661cd';
 let user1 = '4d48ba82dc8607c9';
-let transaction_id1 = '1a0cdc5da312f9e1';
+let transaction_id1 = 'a3565ec43e560f20';
 
 let keypair = new KeyPair();
 keypair.generate();
@@ -63,7 +62,9 @@ describe('test', async () => {
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        let tx = await help.make_transaction(new Buffer(user1, "hex"), keypair, 0, 0, true);
+        let tx = await helper.make_transaction(new Buffer(user1, "hex"), 0, 0, true);
+        await helper.sign_and_add_signature(tx, keypair);
+
         let bsonobj = await tx.serialize(false, true);
 
         console.log("1-----------");
@@ -72,7 +73,7 @@ describe('test', async () => {
         console.log("2-----------");
         let parameter = {
             'source_user_id': user1,
-            'transaction_bson': help.Base64.encode(bsonobj)
+            'transaction_bson': helper.Base64.encode(bsonobj)
         };
 
         xhr.addEventListener("load", function (event) {
@@ -94,7 +95,9 @@ describe('test', async () => {
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        let tx = await help.make_transaction(new Buffer(user1, "hex"), keypair, 1, 0, true);
+        let tx = await helper.make_transaction(new Buffer(user1, "hex"), 1, 0, true);
+        await helper.sign_and_add_signature(tx, keypair);
+
         let bsonobj = await tx.serialize(false, true);
 
         let parameter = {
@@ -132,7 +135,6 @@ describe('test', async () => {
         xhr.open('POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false);
         xhr.setRequestHeader('Content-Type', 'application/json');
 
-        let tx = await help.make_transaction(new Buffer(user1, "hex"), keypair, 1, 0, true);
         let parameter = {
             'source_user_id': user1,
             'transaction_id': transaction_id1,
@@ -144,8 +146,38 @@ describe('test', async () => {
         xhr.addEventListener("load", function (event) {
             console.log( 'COMPLETE! traverse_transactions:' );
             console.log(event.target.status);
-            console.log(event.target.responseText); // => "{...}"
+            //console.log(event.target.responseText); // => "{...}"
             expect(200).to.be.eq(event.target.status); // => 200
+        });
+
+        xhr.send(JSON.stringify(parameter));
+        xhr.abort();
+
+    });
+
+
+    it('Test traverse_transactions', async function () {
+
+        console.log("***********************");
+        console.log("Test traverse_transactions"); // コンソール出力
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://' + ip + ':3000/traverse_transactions/' + domain, false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        let parameter = {
+            'source_user_id': user1,
+            'transaction_id': "a3565ec43e560f21",
+            'user_id': user1,
+            'direction': 0,
+            'hop_count': 2
+        };
+
+        xhr.addEventListener("load", function (event) {
+            console.log( 'COMPLETE! traverse_transactions:' );
+            console.log(event.target.status);
+            //console.log(event.target.responseText); // => "{...}"
+            expect(400).to.be.eq(event.target.status); // => 200
         });
 
         xhr.send(JSON.stringify(parameter));

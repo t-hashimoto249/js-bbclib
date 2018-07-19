@@ -1,28 +1,116 @@
-Javascript library for BBc-1 (Beyond Blockchain One). 
+Name
+=====
+BBc-1(Beyond Block-chain One) Library, written in Javascript. 
 
-このライブラリはブロックチェーンのプラットフォームであるbbc-1をブラウザ上のJSもしくはpureJS上で利用するためのライブラリです。
-The library provide 
-serialize, deserialize function for 
+#Overview
+The library provides bbclib and bbc-app-rest-api function on platform of BBc-1.
+The function provides make transactions, sign and verify transactions, serialize and deserialize transaction data in BBc-1. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
+It works on modern browsers(Firefox, IE, Edge, Chrome and Safari) and Node.js. 
+The module is totally written in ES6+ and needed to get transpiled with babel for legacy environments.
 
-
-The library can work on some browser and Node.js.  
-
-The 
-block chaion one 
-
-対応しているブラウザは、Google Chrome、Safari、FireFox、Edge、Internet Explorerです。
+※The design and detail of BBc-1 is following.
 BBc-1: https://github.com/beyond-blockchain/bbc1
-このライブラリでは、bbc-1プラットフォーム上で定義されているTransaction、Event、Asset、Reference、Relation、Signature、Witness、CrossRef、Pointer、KeyPairクラスで必要となる機能を提供します。
-実際には、トランザクションへの署名、トランザクションの署名の検証、RestAPIを用いてbbc-1へトランザクションの挿入、トランザクションの検索を可能とします。
-このモジュールはES6で書かれています。
+  
+#Installation
+At your project directory, do either one of the following.
+
+・From npm/yarn:
+```$xslt
+$npm install --save js-bbclib
+$yarn add js-bbclib
+```
+
+・From GitHub:
+```$xslt
+$git clone https://github.com/t-hashimoto249/js-bbclib.git
+```
+
+#Usage
+The usage explains on the presupposition that bbccore(:9000) and bbc-app-rest(:3000) are set up localhost.
+
+・Make, serialize and sign transaction.
+
+```$xslt
+import * as bbclib from 'js-bbclib.js'
+
+//make transaction
+let user = "4d48ba82dc8607c9";
+let user_id = new Buffer(user, "hex");
+let keypair = new KeyPair();
+keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
+let tx = await helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
+
+//sign and add signature in transaction
+await helper.sign_and_add_signature(tx, keypair)
+
+//serialize transaction for bson
+let bsonobj = await tx.serialize(false, true);
+
+//insert transaction in BBc-1
+let xhr = new XMLHttpRequest();
+xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
+xhr.setRequestHeader('Content-Type', 'application/json');
+let parameter = {
+       'source_user_id': user1,
+       'transaction_bson': helper.Base64.encode(bsonobj)
+};
+
+xhr.addEventListener("load", function (event) {
+    //get response from bbc-app-rest
+    if( event.target.status == 200 || event.target.status == 304 ) {    
+       
+    }else{
+       
+    }
+       
+});
+xhr.send(JSON.stringify(parameter));
+
+```
+
+・Search, deserialize and verify transaction.
+
+```$xslt
+import * as bbclib from 'js-bbclib.js'
+
+//make transaction
+let user = "4d48ba82dc8607c9";
+let user_id = new Buffer(user, "hex");
+let keypair = new KeyPair();
+keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
+let tx = await helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
+
+//sign and add signature in transaction
+await helper.sign_and_add_signature(tx, keypair)
+
+//serialize transaction for bson
+let bsonobj = await tx.serialize(false, true);
+
+//insert transaction in BBc-1
+let xhr = new XMLHttpRequest();
+xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
+xhr.setRequestHeader('Content-Type', 'application/json');
+let parameter = {
+       'source_user_id': user1,
+       'transaction_bson': helper.Base64.encode(bsonobj)
+};
+
+xhr.addEventListener("load", function (event) {
+    //get response from bbc-app-rest
+    if( event.target.status == 200 || event.target.status == 304 ) {    
+       
+    }else{
+       
+    }
+       
+});
+xhr.send(JSON.stringify(parameter));
+
+```
 
 
-Usage
+#License
+Licensed under the MIT license, see LICENSE file.
 
-
-
-使い方
-
-
-
-
+##keyword
+BBc-1, Block-Chain, 

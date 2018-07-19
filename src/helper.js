@@ -5,7 +5,7 @@ import BBcWitness from "./bbcclass/BBcWitness";
 import BBcRelation from "./bbcclass/BBcRelation";
 import jscu from "js-crypto-utils";
 
-export async function make_transaction(user_id, keypair1, event_num, ref_num, witness){
+export async function make_transaction(user_id, event_num, ref_num, witness){
     let txobj = await get_new_transaction(user_id, event_num, ref_num, witness);
     if(event_num > 0 ){
         for (let i = 0; i < event_num; i++){
@@ -13,13 +13,15 @@ export async function make_transaction(user_id, keypair1, event_num, ref_num, wi
             txobj.events[i].add_mandatory_approver(hexStringToByte("0"));
         }
     }
-
     txobj.witness.add_witness(user_id);
-    let sig = await txobj.sign(null, null, keypair1);
     await txobj.set_transaction_id();
-    txobj.add_signature(user_id, sig);
-    await txobj.digest();
     return txobj
+}
+
+export async function sign_and_add_signature( transaction, key_pair){
+    let sig = await transaction.sign(null, null, key_pair);
+    transaction.add_signature(transaction.user_id, sig);
+    return
 }
 
 export async function get_new_transaction(user_id, event_num, relation_num, witness){

@@ -1,1 +1,0 @@
-../../node_modules/bson/browser_build/bson.js
