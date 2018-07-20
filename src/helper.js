@@ -116,7 +116,6 @@ export function print_bin(bin){
     console.log(d);
 }
 
-
 export async function create_pubkey_byte(pubkey){
     let byte_x = await jscu.helper.encoder.decodeBase64Url(pubkey['x']);
     let byte_y = await jscu.helper.encoder.decodeBase64Url(pubkey['y']);
