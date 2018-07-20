@@ -3,8 +3,8 @@ Name
 BBc-1(Beyond Block-chain One) Library, written in Javascript. 
 
 # Overview
-The library is implemented bbclib and bbc-app-rest-api function on platform of BBc-1.
-The function provides make transactions, sign and verify transactions, serialize and deserialize transaction data in BBc-1. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
+The library is implemented bbclib and bbc-app-rest-api functions on platform of BBc-1.
+The functions are provides make transactions, sign and verify transactions, serialize and deserialize transaction data in BBc-1. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
 It works on modern browsers(Firefox, IE, Edge, Chrome and Safari) and Node.js. 
 The module is totally written in ES6+ and needed to get transpiled with babel for legacy environments.
 
