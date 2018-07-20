@@ -102,7 +102,7 @@ describe('test', async () => {
 
         let parameter = {
             'source_user_id': user1,
-            'transaction_bson': Base64.encode(bsonobj)
+            'transaction_bson': helper.Base64.encode(bsonobj)
         };
 
         xhr.addEventListener("load", function (event) {
@@ -114,15 +114,6 @@ describe('test', async () => {
 
         xhr.send(JSON.stringify(parameter));
         xhr.abort();
-
-    });
-
-    it('Test search_transaction_with_condition', async function () {
-
-        console.log("***********************");
-        console.log("Test Rest API for insert_transaction with event"); // コンソール出力
-
-
 
     });
 
@@ -200,7 +191,7 @@ describe('test', async () => {
             xhr.setRequestHeader( 'Content-Type', 'application/json' );
             let parameter = {
                 'source_user_id': user1,
-                'transaction_id': Base64.decode(transaction_id1)
+                'transaction_id': helper.Base64.decode(transaction_id1)
             };
 
             xhr.addEventListener("load", async (event) => {
@@ -210,7 +201,7 @@ describe('test', async () => {
                     console.log( 'COMPLETE serarch transaction! :'+data );
                     let json = JSON.parse(data);
                     console.log(json);
-                    let bson_data = Buffer.from(Base64.decode(json["transaction_bson"]));
+                    let bson_data = Buffer.from(helper.Base64.decode(json["transaction_bson"]));
                     console.log("bson_data:");
                     console.log(bson_data);
                     let transaction = new BBcTransaction(0);
@@ -252,42 +243,3 @@ describe('test', async () => {
 
 
 });
-
-
-
-let Base64 = {
-    encode: (function(i, tbl) {
-        for(i=0,tbl={64:61,63:47,62:43}; i<62; i++) {tbl[i]=i<26?i+65:(i<52?i+71:i-4);} //A-Za-z0-9+/=
-        return function(arr) {
-            let len, str, buf;
-            if (!arr || !arr.length) {return "";}
-            for(i=0,len=arr.length,buf=[],str=""; i<len; i+=3) { //6+2,4+4,2+6
-                str += String.fromCharCode(
-                    tbl[arr[i] >>> 2],
-                    tbl[(arr[i]&3)<<4 | arr[i+1]>>>4],
-                    tbl[i+1<len ? (arr[i+1]&15)<<2 | arr[i+2]>>>6 : 64],
-                    tbl[i+2<len ? (arr[i+2]&63) : 64]
-                );
-            }
-            return str;
-        };
-    }()),
-    decode: (function(i, tbl) {
-        for(i=0,tbl={61:64,47:63,43:62}; i<62; i++) {tbl[i<26?i+65:(i<52?i+71:i-4)]=i;} //A-Za-z0-9+/=
-        return function(str) {
-            let j, len, arr, buf;
-            if (!str || !str.length) {return [];}
-            for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                //for(i=0,len=str.length,arr=[],buf=[]; i<len; i+=4) { //6,2+4,4+2,6
-                for(j=0; j<4; j++) {buf[j] = tbl[str.charCodeAt(i+j)||0];}
-                arr.push(
-                    buf[0]<<2|(buf[1]&63)>>>4,
-                    (buf[1]&15)<<4|(buf[2]&63)>>>2,
-                    (buf[2]&3)<<6|buf[3]&63
-                );
-            }
-            if (buf[3]===64) {arr.pop();if (buf[2]===64) {arr.pop();}}
-            return arr;
-        };
-    }())
-};
