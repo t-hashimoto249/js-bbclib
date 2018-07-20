@@ -41,8 +41,8 @@ const webConfig = {
             //auth: ['./src/index.mjs'],
             //'test.bbclib': ['./test/bbclib.test.js'],
             //'test.connection': ['./test/transaction_check.test.js'],
-            'test.test': ['./test/test_bbclib.js'],
-            'test.test2': ['./test/test_connection_bbcapp_and_bbccore.test.js']
+            'test.bbclib': ['./test/test_bbclib.js'],
+            'test.bbc-app-rest': ['./test/test_connection_bbcapp_and_bbccore.test.js']
             //'test.register': ['./test/api.register.spec.mjs'],
             //'test.refresh': ['./test/api.refresh.spec.mjs']
             // testはcommon-js記法だと動かないのでここでwebpack & babelしてしまう。
