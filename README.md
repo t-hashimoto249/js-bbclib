@@ -2,8 +2,8 @@ Name
 =====
 BBc-1(Beyond Block-chain One) Library, written in Javascript. 
 
-#Overview
-The library provides bbclib and bbc-app-rest-api function on platform of BBc-1.
+# Overview
+The library is implemented bbclib and bbc-app-rest-api function on platform of BBc-1.
 The function provides make transactions, sign and verify transactions, serialize and deserialize transaction data in BBc-1. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
 It works on modern browsers(Firefox, IE, Edge, Chrome and Safari) and Node.js. 
 The module is totally written in ES6+ and needed to get transpiled with babel for legacy environments.
@@ -11,21 +11,21 @@ The module is totally written in ES6+ and needed to get transpiled with babel fo
 ※The design and detail of BBc-1 is following.
 BBc-1: https://github.com/beyond-blockchain/bbc1
   
-#Installation
+# Installation
 At your project directory, do either one of the following.
 
 ・From npm/yarn:
 ```$xslt
-$npm install --save js-bbclib
-$yarn add js-bbclib
+$ npm install --save js-bbclib
+$ yarn add js-bbclib
 ```
 
 ・From GitHub:
 ```$xslt
-$git clone https://github.com/t-hashimoto249/js-bbclib.git
+$ git clone https://github.com/t-hashimoto249/js-bbclib.git
 ```
 
-#Usage
+# Usage
 The usage explains on the presupposition that bbccore(:9000) and bbc-app-rest(:3000) are set up localhost.
 
 ・Make, serialize and sign transaction.
@@ -109,8 +109,8 @@ xhr.send(JSON.stringify(parameter));
 ```
 
 
-#License
+# License
 Licensed under the MIT license, see LICENSE file.
 
-##keyword
+## keyword
 BBc-1, Block-Chain, 
