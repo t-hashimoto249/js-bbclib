@@ -4,7 +4,7 @@ BBc-1(Beyond Block-chain One) Library, written in Javascript.
 
 # Overview
 The library is implemented bbclib and bbc-app-rest-api functions on platform of BBc-1.
-It provides make transactions, sign and verify transactions, serialize and deserialize transaction data in BBc-1. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
+It provides make transaction function, sign and verify transaction function, serialize and deserialize function for some collection of data on BBc-1 platform. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
 It works on modern browsers(Firefox, IE, Edge, Chrome and Safari) and Node.js. 
 The module is totally written in ES6+ and needed to get transpiled with babel for legacy environments.
 
@@ -26,7 +26,7 @@ $ git clone https://github.com/t-hashimoto249/js-bbclib.git
 ```
 
 # Usage
-The usage explains on the presupposition that bbccore(:9000) and bbc-app-rest(:3000) are set up localhost.
+First, you set up bbccore(:9000) and bbc-app-rest(:3000) on localhost or anther node.
 
 ・Make, serialize and sign transaction.
 
@@ -48,6 +48,7 @@ let bsonobj = await tx.serialize(false, true);
 
 //insert transaction in BBc-1
 let xhr = new XMLHttpRequest();
+let ip = "127.0.0.1"
 xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
 xhr.setRequestHeader('Content-Type', 'application/json');
 let parameter = {
@@ -88,6 +89,7 @@ let bsonobj = await tx.serialize(false, true);
 
 //insert transaction in BBc-1
 let xhr = new XMLHttpRequest();
+let ip = "127.0.0.1"
 xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
 xhr.setRequestHeader('Content-Type', 'application/json');
 let parameter = {
