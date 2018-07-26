@@ -4,15 +4,21 @@ BBc-1(Beyond Block-chain One) Library, written in Javascript.
 
 # Overview
 The library is implemented bbclib and bbc-app-rest-api functions on platform of BBc-1.
-It provides make transaction function, sign and verify transaction function, serialize and deserialize function for some collection of data on BBc-1 platform. (The data are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
+It provides make transaction function, sign and verify transaction function, serialize and deserialize function for some collection of data on BBc-1 platform. (They are BBcTransaction, BBcEvent, BBcAsset, BBcSignature, BBcRelation, BBcReference, BBcCrossRef, BBcPointer and BBcWitness).
 It works on modern browsers(Firefox, IE, Edge, Chrome and Safari) and Node.js. 
 The module is totally written in ES6+ and needed to get transpiled with babel for legacy environments.
 
-※The design and detail of BBc-1 is following.
+※The design and detail of BBc-1 is following.<br>
 BBc-1: https://github.com/beyond-blockchain/bbc1
   
 # Installation
-At your project directory, do the following.
+At your project directory, do either one of the following.
+
+・From npm/yarn:
+```$xslt
+$ npm install --save js-bbclib
+$ yarn add js-bbclib
+```
 
 ・From GitHub:
 ```$xslt
@@ -30,12 +36,12 @@ import * as bbclib from 'js-bbclib.js'
 //make transaction
 let user = "4d48ba82dc8607c9";
 let user_id = new Buffer(user, "hex");
-let keypair = new KeyPair();
+let keypair = new bbclib.KeyPair();
 keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
-let tx = await helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
+let tx = await bbclib.helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
 
 //sign and add signature in transaction
-await helper.sign_and_add_signature(tx, keypair)
+await bbclib.helper.sign_and_add_signature(tx, keypair)
 
 //serialize transaction for bson
 let bsonobj = await tx.serialize(false, true);
@@ -47,7 +53,7 @@ xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
 xhr.setRequestHeader('Content-Type', 'application/json');
 let parameter = {
        'source_user_id': user1,
-       'transaction_bson': helper.Base64.encode(bsonobj)
+       'transaction_bson': bbclib.helper.Base64.encode(bsonobj)
 };
 
 xhr.addEventListener("load", function (event) {
@@ -71,12 +77,12 @@ import * as bbclib from 'js-bbclib.js'
 //make transaction
 let user = "4d48ba82dc8607c9";
 let user_id = new Buffer(user, "hex");
-let keypair = new KeyPair();
+let keypair = new bbclib.KeyPair();
 keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
-let tx = await helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
+let tx = await bbclib.helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
 
 //sign and add signature in transaction
-await helper.sign_and_add_signature(tx, keypair)
+await bbclib.helper.sign_and_add_signature(tx, keypair)
 
 //serialize transaction for bson
 let bsonobj = await tx.serialize(false, true);
@@ -88,7 +94,7 @@ xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
 xhr.setRequestHeader('Content-Type', 'application/json');
 let parameter = {
        'source_user_id': user1,
-       'transaction_bson': helper.Base64.encode(bsonobj)
+       'transaction_bson': bbclib.helper.Base64.encode(bsonobj)
 };
 
 xhr.addEventListener("load", function (event) {
