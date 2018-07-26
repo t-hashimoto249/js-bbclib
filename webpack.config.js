@@ -41,23 +41,19 @@ const webConfig = {
             //auth: ['./src/index.mjs'],
             //'test.bbclib': ['./test/bbclib.test.js'],
             //'test.connection': ['./test/transaction_check.test.js'],
-            'test.bbclib': ['./test/test_bbclib.js'],
-            'test.bbc-app-rest': ['./test/test_connection_bbcapp_and_bbccore.test.js']
-            //'test.register': ['./test/api.register.spec.mjs'],
-            //'test.refresh': ['./test/api.refresh.spec.mjs']
+            'js-bbclib': ['./src/index.js']
+            //'test.bbc-app-rest': ['./test/test_connection_bbcapp_and_bbccore.test.js']
             // testはcommon-js記法だと動かないのでここでwebpack & babelしてしまう。
             // @babel/polyfill はIE11で動かないときなどで必要, libを作るときはGlobalが汚染されるのでこれを読み込むlibやhtmlの方でpolyfillを呼ぶこと。
         },
     output: {
-        path: `${__dirname}/dist`,
-        //filename: 'main.js'
         filename: '[name].bundle.js',
         chunkFilename: '[name].js',
-        //path: path.resolve(__dirname, 'dist'),
-        //publicPath: path.resolve(__dirname, 'dist'),
-        //library: 'Auth',
-        //libraryTarget: 'umd',
-        //globalObject: 'this' // for node js import
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: path.resolve(__dirname, 'dist'),
+        library: 'js-bbclib',
+        libraryTarget: 'umd',
+        globalObject: 'this' // for node js import
     },
     resolve: {
         extensions: ['.js', '.ts']
@@ -71,14 +67,10 @@ const webConfig = {
                     options: getBabelWebOpt()
                 }],
                 exclude: path.join(__dirname, 'node_modules') // exclude: /node_modules/
-                // exclude: /node_modules\/(?!(js-crypto-utils)\/).*/,
-                // exclude: /node_modules(?!\/js-crypto-utils)/
             }
         ]
     },
     externals:[{
-        // このwebpackで生成したライブラリを更に読み込んでwebpackする場合は指定。package.json/browserだけでは不十分。
-        // 主に、jscuでrequireしているライブラリも含めて列挙するのが安全のよう。
         'xmlhttprequest': true, // 'xmlhttprequest': '{XMLHttpRequest:XMLHttpRequest}',
         'path': true,
         'fs': true,
@@ -89,7 +81,6 @@ const webConfig = {
         'cbytes': true,
         'assertArrays': true,
         'cjson': true
-
     }],
     plugins:[
         new webpack.optimize.LimitChunkCountPlugin({
@@ -100,11 +91,6 @@ const webConfig = {
     node: {
         fs: 'empty'
     }
-    // optimization: { // TODO: 分割の設定
-    //   splitChunks: {
-    //     chunks: 'all'
-    //   }
-    // }
 };
 
 module.exports = (env, argv) => {

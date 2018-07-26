@@ -12,13 +12,7 @@ The module is totally written in ES6+ and needed to get transpiled with babel fo
 BBc-1: https://github.com/beyond-blockchain/bbc1
   
 # Installation
-At your project directory, do either one of the following.
-
-・From npm/yarn:
-```$xslt
-$ npm install --save js-bbclib
-$ yarn add js-bbclib
-```
+At your project directory, do the following.
 
 ・From GitHub:
 ```$xslt
