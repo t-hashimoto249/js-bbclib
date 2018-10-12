@@ -71,7 +71,7 @@ describe('test', () => {
         console.log("***********************");
         console.log("Test for BBcAsset Class.");
 
-        const user_id = await jscu.crypto.random.getRandomBytes(32);
+        const user_id = await jscu.random.getRandomBytes(32);
         let bbcAsset = new BBcAsset(user_id);
 
         await bbcAsset.set_random_nonce();
@@ -109,8 +109,8 @@ describe('test', () => {
         let bbcEvent = new BBcEvent(null);
         let event_deserialise = new BBcEvent(null);
 
-        const user_id = await jscu.crypto.random.getRandomBytes(8);
-        const asset_group_id = await jscu.crypto.random.getRandomBytes(8);
+        const user_id = await jscu.random.getRandomBytes(8);
+        const asset_group_id = await jscu.random.getRandomBytes(8);
         let asset = new BBcAsset(user_id);
         asset.add_user_id(user_id);
         await asset.add_asset(null, hexStringToByte("123456"));
@@ -195,7 +195,7 @@ describe('test', () => {
     it('Test for BBcSignature Class.', async function (done){
     //it('Test for BBcSignature Class.', async () => {
 
-        this.timeout(1000000);
+        timeout(20000000);
         console.log("***********************");
         console.log("Test for BBcSignature Class");
 
@@ -205,20 +205,14 @@ describe('test', () => {
         let key_pair = new KeyPair();
         await key_pair.generate();
         let sig = new Buffer(8);
-
         await bbcSignature.add(sig, key_pair.public_key);
-
-        //bbcSignature.show_sig();
-
         let signature_serialize = bbcSignature.serialize();
         let signature_deserialize = new BBcSignature(2);
-        console.log("***********************1");
         await signature_deserialize.deserialize(signature_serialize);
-        //signature_deserialize.show_sig();
 
         //expect(bbcSignature.signature).to.be.a(signature_deserialize.signature);
         expect(bbcSignature.pubkey["crv"]).to.equal(signature_deserialize.pubkey["crv"]);
-       // expect(bbcSignature.pubkey["ext"]).to.be.a(signature_deserialize.pubkey["ext"]);
+        //expect(bbcSignature.pubkey["ext"]).to.be.a(signature_deserialize.pubkey["ext"]);
         expect(bbcSignature.pubkey["EC"]).to.equal(signature_deserialize.pubkey["EC"]);
         expect(bbcSignature.pubkey["x"]).to.equal(signature_deserialize.pubkey["x"]);
         expect(bbcSignature.pubkey["y"]).to.equal(signature_deserialize.pubkey["y"]);
@@ -302,7 +296,7 @@ describe('test', () => {
         const msg = new Buffer(1);
         for(let i = 0; i < 1; i++) msg[i] = 0xFF & 0x00;
 
-        const digest = await jscu.crypto.hash.getHash('SHA-256', msg);
+        const digest = await jscu.hash.compute(msg,'SHA-256');
 
         expect(digest[0].toString(16)).to.be.eq("6e");
         expect(digest[1].toString(16)).to.be.eq("34");

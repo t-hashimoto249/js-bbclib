@@ -1,4 +1,5 @@
 import jscu from "js-crypto-utils";
+import jseu from "js-encoding-utils";
 
 export default class {
     constructor() {
@@ -7,12 +8,12 @@ export default class {
     }
 
     async generate() {
-        const getKeyParam = (elem) => ({keyType: 'EC', namedCurve: elem });
-        const param = getKeyParam('P-256');
+        //const getKeyParam = (elem) => ({keyType: 'EC', namedCurve: elem });
+        //const param = getKeyParam('P-256');
 
-        let keys = await jscu.crypto.generateKeyPair(param);
-        this.private_key = keys.privateKey.key;
-        this.public_key = keys.publicKey.key;
+        let keys = await jscu.pkc.generateKey('EC',{namedCurve:'P-256'});
+        this.private_key = keys.privateKey;
+        this.public_key = keys.publicKey;
         return true;
     }
 
@@ -26,16 +27,16 @@ export default class {
     }
 
     async sign(msg){
-        return new Uint8Array(await jscu.crypto.sign(msg, this.private_key, {name: 'SHA-256'}));
+        return new Uint8Array(await jscu.pkc.sign(msg, this.private_key, 'SHA-256'));
     }
 
     async verify(msg, sig){
-        return  await jscu.crypto.verify(msg, sig, this.public_key, {name: 'SHA-256'});
+        return  await jscu.pkc.verify(msg, sig, this.public_key, 'SHA-256');
     }
 
     async create_pubkey_byte(public_key){
-        let byte_x = await jscu.helper.encoder.decodeBase64Url(public_key['x']);
-        let byte_y = await jscu.helper.encoder.decodeBase64Url(public_key['y']);
+        let byte_x = await jseu.encoder.decodeBase64Url(public_key['x']);
+        let byte_y = await jseu.encoder.decodeBase64Url(public_key['y']);
 
         let public_key_byte = new Buffer(65);
         public_key_byte[0]= 0x04;

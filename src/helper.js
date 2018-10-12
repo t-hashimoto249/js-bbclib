@@ -4,6 +4,8 @@ import BBcTransaction from "./bbcclass/BBcTransaction";
 import BBcWitness from "./bbcclass/BBcWitness";
 import BBcRelation from "./bbcclass/BBcRelation";
 import jscu from "js-crypto-utils";
+import jseu from "js-encoding-utils";
+
 
 export async function make_transaction(user_id, event_num, ref_num, witness){
     let txobj = await get_new_transaction(user_id, event_num, ref_num, witness);
@@ -100,8 +102,8 @@ export let Base64 = {
 };
 
 export async function get_random_value(length){
-    const msg = await jscu.crypto.random.getRandomBytes(length);
-    const d = await jscu.crypto.hash.getHash('SHA-256', msg);
+    const msg = await jscu.random.getRandomBytes(length);
+    const d = await jscu.hash.compute( msg,'SHA-256');
     return d;
 }
 
@@ -117,8 +119,8 @@ export function print_bin(bin){
 }
 
 export async function create_pubkey_byte(pubkey){
-    let byte_x = await jscu.helper.encoder.decodeBase64Url(pubkey['x']);
-    let byte_y = await jscu.helper.encoder.decodeBase64Url(pubkey['y']);
+    let byte_x = await jseu.encoder.decodeBase64Url(pubkey['x']);
+    let byte_y = await jseu.encoder.decodeBase64Url(pubkey['y']);
 
     let pubkey_byte = new Buffer(65);
     pubkey_byte[0]= 0x04;

@@ -186,7 +186,7 @@ export default class {
 
     async set_transaction_id(){
         this.target_serialize = new Uint8Array(await this.serialize(true, false));
-        let id = await jscu.crypto.hash.getHash('SHA-256', this.target_serialize);
+        let id = await jscu.hash.compute(this.target_serialize,'SHA-256');
         this.transaction_id = id.slice(0,this.id_length);
         return this.transaction_id;
     }
@@ -231,7 +231,7 @@ export default class {
         }
 
         let target = bson.serialize(tx_base,{});
-        this.transaction_base_digest = new Buffer(await jscu.crypto.hash.getHash('SHA-256', target));
+        this.transaction_base_digest = new Buffer(await jscu.hash.compute( target, 'SHA-256' ));
 
         if (for_id === true){
             return bson.serialize({

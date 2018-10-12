@@ -1,5 +1,6 @@
 import KeyPair from "./KeyPair.js";
-import jscu from "js-crypto-utils";
+import jseu from "js-encoding-utils";
+
 import * as helper from '../helper.js';
 
 export default class {
@@ -89,8 +90,8 @@ export default class {
         const offset = 1;
         const hexX = hexKeyObj.slice(offset, offset+len*2);
         const hexY = hexKeyObj.slice(offset+len*2, offset+len*4);
-        const b64uX = await jscu.helper.encoder.encodeBase64Url(hexX);
-        const b64uY = await jscu.helper.encoder.encodeBase64Url(hexY);
+        const b64uX = jseu.encoder.encodeBase64Url(hexX);
+        const b64uY = jseu.encoder.encodeBase64Url(hexY);
 
         return { // https://www.rfc-editor.org/rfc/rfc7518.txt
             crv: algo,

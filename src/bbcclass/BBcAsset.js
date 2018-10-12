@@ -45,7 +45,7 @@ export default class {
     }
 
     async set_random_nonce(){
-        this.nonce = await helper.get_random_value(32);
+        this.nonce = await jscu.random.getRandomBytes(32);
     }
 
     set_nonce(nonce){
@@ -62,7 +62,7 @@ export default class {
         if(asset_file !== null) {
             this.asset_file = asset_file;
             this.asset_file_size = asset_file.length;
-            this.asset_file_digest = await jscu.crypto.hash.getHash('SHA-256', asset_file);
+            this.asset_file_digest = await jscu.hash.compute(asset_file,'SHA-256');
         }
 
         if(asset_body !== null) {
@@ -76,13 +76,13 @@ export default class {
 
     async digest(){
         let target = this.serialize(true);
-        this.asset_id = new Buffer(await jscu.crypto.hash.getHash('SHA-256', target)).slice(0,this.id_length);
+        this.asset_id = new Buffer(await jscu.hash.compute(target,'SHA-256')).slice(0,this.id_length);
         return this.asset_id;
     }
 
     async set_asset_id(){
         let target = this.serialize(true);
-        this.asset_id = await jscu.crypto.hash.getHash('SHA-256', target);
+        this.asset_id = await jscu.hash.compute(target,'SHA-256');
         return this.asset_id;
     }
 
@@ -100,7 +100,7 @@ export default class {
     }
 
     async check_asset_file(asset_file){
-        let digest = await jscu.crypto.hash.getHash('SHA-256', asset_file);
+        let digest = await jscu.hash.compute( asset_file,'SHA-256');
         return (digest === this.asset_file_digest);
     }
 
