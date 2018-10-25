@@ -4,7 +4,7 @@ import * as para from '../parameter.js';
 
 export default class {
     constructor(asset_group_id){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         if (asset_group_id != null ){
             this.asset_group_id = asset_group_id;
         }else{
@@ -43,7 +43,6 @@ export default class {
 
     add_pointer(pointer){
         if (pointer != null){
-            console.log(this.pointers);
             this.pointers.push(pointer);
         }
     }
@@ -80,7 +79,6 @@ export default class {
         }
 
         let assetdat = data['asset'];
-        console.log();
         if(assetdat != null){
 
             this.asset = new BBcAsset(null);

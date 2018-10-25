@@ -8,9 +8,6 @@ export default class {
     }
 
     async generate() {
-        //const getKeyParam = (elem) => ({keyType: 'EC', namedCurve: elem });
-        //const param = getKeyParam('P-256');
-
         let keys = await jscu.pkc.generateKey('EC',{namedCurve:'P-256'});
         this.private_key = keys.privateKey;
         this.public_key = keys.publicKey;
@@ -31,7 +28,7 @@ export default class {
     }
 
     async verify(msg, sig){
-        return  await jscu.pkc.verify(msg, sig, this.public_key, 'SHA-256');
+        return await jscu.pkc.verify(msg, sig, this.public_key, 'SHA-256');
     }
 
     async create_pubkey_byte(public_key){

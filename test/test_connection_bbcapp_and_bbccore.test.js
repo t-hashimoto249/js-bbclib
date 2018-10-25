@@ -54,7 +54,6 @@ describe('test', async () => {
 
     });
 
-
     it('Test insert transaction', async function () {
 
         console.log("***********************");

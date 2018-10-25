@@ -3,7 +3,7 @@ import * as para from '../parameter.js';
 
 export default class {
     constructor( asset_group_id){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         this.asset_group_id = asset_group_id;
         this.reference_indices = [];
         this.mandatory_approvers = [];
@@ -19,11 +19,21 @@ export default class {
         console.log("id_length");
         console.log(this.id_length);
         console.log("asset_group_id");
-        console.log(this.asset_group_id);
+        console.log(this.asset_group_id.toString("hex"));
         console.log("reference_indices");
-        console.log(this.reference_indices);
+        if (this.reference_indices.length > 0){
+            for (let i = 0; i < this.reference_indices.length; i++){
+                console.log(this.reference_indices[i]);
+            }
+        }
+
         console.log("mandatory_approvers");
-        console.log(this.mandatory_approvers);
+        if (this.mandatory_approvers.length > 0){
+          for (let i = 0; i < this.mandatory_approvers.length; i++){
+            console.log(this.mandatory_approvers[i].toString("hex"));
+          }
+        }
+
         console.log("option_approver_num_numerator");
         console.log(this.option_approver_num_numerator);
         console.log("option_approver_num_denominator");
@@ -95,9 +105,7 @@ export default class {
             this.asset = new BBcAsset("");
             this.asset.deserialize(asset);
         }
-
         return true
-
     }
 
 }

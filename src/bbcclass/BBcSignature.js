@@ -18,11 +18,11 @@ export default class {
         console.log("key_type");
         console.log(this.key_type);
         console.log("signature");
-        helper.print_bin(this.signature);
+        console.log(this.signature.toString("hex"));
         console.log("pubkey");
         console.log(this.pubkey);
         console.log("pubkey_byte");
-        helper.print_bin(this.pubkey_byte);
+        console.log(this.pubkey_byte .toString("hex"));
         console.log("keypair");
         console.log(this.keypair);
         console.log("not_initialized");
@@ -54,11 +54,8 @@ export default class {
 
         return {
             'key_type': this.key_type,
-            //'key_type': this.key_type,
             'pubkey_len': pubkey_len_bit,
-            //'pubkey': Buffer.from(this.pubkey_byte),
             'pubkey': this.pubkey_byte,
-            //'pubkey': await this.create_pubkey(this.pubkey),
             'signature_len': sig_len_bit,
             'signature': new Buffer(this.signature),
         };
@@ -68,10 +65,6 @@ export default class {
         this.key_type = data['key_type'];
         let pubkey = data['pubkey'];
         let signature = data['signature'];
-        console.log("pubkey");
-        console.log(pubkey);
-        console.log("signature");
-        console.log(signature);
 
         //65byteの鍵形式からJwkへ変換してinput
         await this.add(signature, await this.convertRawHexKeyToJwk(pubkey, 'P-256'));

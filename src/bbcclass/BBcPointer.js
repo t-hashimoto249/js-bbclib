@@ -2,7 +2,7 @@ import * as para from '../parameter.js';
 
 export default class {
     constructor(transaction_id, asset_id){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         if (transaction_id != null){
             this.transaction_id = transaction_id;
         }else{
@@ -19,9 +19,9 @@ export default class {
 
     show_pointer(){
         console.log("transaction_id");
-        console.log(this.transaction_id);
+        console.log(this.transaction_id.toString("hex"));
         console.log("asset_id");
-        console.log(this.asset_id);
+        console.log(this.asset_id.toString("hex"));
     }
 
     set_transaction_id(transaction_id){

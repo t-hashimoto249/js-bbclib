@@ -2,7 +2,7 @@ import * as para from '../parameter.js';
 
 export default class {
     constructor( ){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         this.transaction = null;
         this.user_ids = [];
         this.sig_indices = [];
@@ -12,9 +12,14 @@ export default class {
         console.log("this.transaction");
         console.log(this.transaction);
         console.log("this.user_ids");
-        console.log(this.user_ids);
+        //console.log(this.user_ids);
+        for (let i =0; i < this.user_ids.length; i++){
+          console.log(this.user_ids[i].toString("hex"));
+        }
         console.log("this.sig_indices");
-        console.log(this.sig_indices);
+        for (let i =0; i < this.sig_indices.length; i++) {
+          console.log(this.sig_indices[i]);
+        }
     }
 
     add_witness(user_id){

@@ -3,7 +3,7 @@ import * as helper from '../helper.js';
 
 export default class {
     constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         this.asset_group_id = asset_group_id;
         this.transaction_id = null;
         this.transaction = transaction;

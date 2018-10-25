@@ -7,6 +7,7 @@ import BBcEvent from './BBcEvent.js';
 import BBcCrossRef from './BBcCrossRef';
 import KeyPair from "./KeyPair.js";
 import * as para from '../parameter.js';
+import pako from "pako";
 
 let BSON = require('bson');
 let bson = new BSON();
@@ -16,8 +17,8 @@ let date = new Date() ;
 export default class {
 
     constructor(version){
-        this.format_type = para.BBcFormat.FORMAT_BSON;
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.format_type = para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB;
+        this.id_length = para.DefaultLength.BBcOne;
         this.version = version;
         this.timestamp = Math.floor(date.getTime() / 1000); //秒単位で記載
         this.events = [];
@@ -76,9 +77,9 @@ export default class {
         console.log("userid_sigidx_mapping");
         console.log(this.userid_sigidx_mapping);
         console.log("transaction_id");
-        console.log(this.transaction_id);
+        console.log(this.transaction_id.toString("hex"));
         console.log("transaction_base_digest");
-        console.log(this.transaction_base_digest);
+        console.log(this.transaction_base_digest.toString("hex"));
         console.log("transaction_data");
         console.log(this.transaction_data);
         console.log("asset_group_ids");
@@ -191,7 +192,7 @@ export default class {
         return this.transaction_id;
     }
 
-    async serialize(for_id, no_header){
+    async serialize(for_id){
         let witness = null;
         if (this.witness != null){
             witness = this.witness.serialize();
@@ -252,13 +253,15 @@ export default class {
             "signatures": signature_list
         },{});
 
-        if (no_header === true) {
-            return dat;
-        }
-
         let format_type_buffer = new Buffer(2);
         format_type_buffer[1] = 0xff & 0x00;
         format_type_buffer[0] = 0xff & this.format_type;
+
+        if(this.format_type === para.BBcFormat.FORMAT_BSON){
+
+        }else if(this.format_type === para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB){
+          dat = pako.deflate(dat);
+        }
 
         this.transaction_data = new Uint8Array(format_type_buffer.length + dat.length);
         this.transaction_data.set(format_type_buffer);
@@ -268,6 +271,18 @@ export default class {
     }
 
     async deserialize(data){
+        let format = data[0];
+        if(format === para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB){
+            data = Buffer.from(pako.inflate(data.slice(2, data.length)));
+
+        }else if (format === para.BBcFormat.FORMAT_BSON){
+            data = Buffer.from(data.slice(2, data.length));
+
+        }else{
+            return false;
+
+        }
+
         let bson_data = bson.deserialize(data,{});
         let tx_base = bson_data["transaction_base"];
         this.version = tx_base["header"]["version"];
@@ -305,6 +320,8 @@ export default class {
             this.witness = new BBcWitness();
             this.witness.transaction = this;
             this.witness.deserialize(tx_base["witness"]);
+            console.log("witness");
+            console.log(this.witness);
         } else {
             this.witness = null;
         }

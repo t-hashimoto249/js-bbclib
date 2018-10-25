@@ -8,7 +8,7 @@ let bson = new BSON();
 
 export default class {
     constructor(user_id){
-        this.id_length = para.DefaultLength.BBcSimple;
+        this.id_length = para.DefaultLength.BBcOne;
         this.user_id = user_id; // byte
         this.asset_id = null; // byte
         this.nonce = null; // byte
@@ -27,25 +27,25 @@ export default class {
             helper.print_bin(this.asset_id);
         }
         console.log("this.user_id");
-        console.log(this.user_id);
+        console.log(this.user_id.toString("hex"));
         console.log("this.nonce");
-        console.log(this.nonce);
+        console.log(this.nonce.toString("hex"));
         console.log("this.asset_file_size");
         console.log(this.asset_file_size);
         console.log("this.asset_file");
-        console.log(this.asset_file);
+        console.log(this.asset_file.toString("hex"));
         console.log("this.asset_file_digest");
-        console.log(this.asset_file_digest);
+        console.log(this.asset_file_digest.toString("hex"));
         console.log("this.asset_body_size");
         console.log(this.asset_body_size);
         console.log("this.asset_body");
-        console.log(this.asset_body);
+        console.log(this.asset_body.toString("hex"));
         console.log("--------------------------");
 
     }
 
     async set_random_nonce(){
-        this.nonce = await jscu.random.getRandomBytes(32);
+        this.nonce = Buffer.from(await jscu.random.getRandomBytes(32));
     }
 
     set_nonce(nonce){
@@ -62,7 +62,7 @@ export default class {
         if(asset_file !== null) {
             this.asset_file = asset_file;
             this.asset_file_size = asset_file.length;
-            this.asset_file_digest = await jscu.hash.compute(asset_file,'SHA-256');
+            this.asset_file_digest = Buffer.from(await jscu.hash.compute(asset_file,'SHA-256'));
         }
 
         if(asset_body !== null) {
@@ -76,7 +76,7 @@ export default class {
 
     async digest(){
         let target = this.serialize(true);
-        this.asset_id = new Buffer(await jscu.hash.compute(target,'SHA-256')).slice(0,this.id_length);
+        this.asset_id = Buffer.from(new Buffer(await jscu.hash.compute(target,'SHA-256')).slice(0, this.id_length));
         return this.asset_id;
     }
 
