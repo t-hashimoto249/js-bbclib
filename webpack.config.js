@@ -36,13 +36,9 @@ const webConfig = {
     target: 'web',
     entry:
         {
-            //'bbclib': ['./src/bbcclass/*'],
-            //'babel-polyfill': ['./html/src/*.js', './html/src/*/*.js'],
-            //auth: ['./src/index.mjs'],
-            //'test.bbclib': ['./test/bbclib.test.js'],
+            'test.bbclib': ['./test/test_bbclib.js'],
             //'test.connection': ['./test/transaction_check.test.js'],
-            'js-bbclib': ['./src/index.js']
-            //'test.bbc-app-rest': ['./test/test_connection_bbcapp_and_bbccore.test.js']
+            'bbclib': ['./src/index.js']
             // testはcommon-js記法だと動かないのでここでwebpack & babelしてしまう。
             // @babel/polyfill はIE11で動かないときなどで必要, libを作るときはGlobalが汚染されるのでこれを読み込むlibやhtmlの方でpolyfillを呼ぶこと。
         },
@@ -71,16 +67,15 @@ const webConfig = {
         ]
     },
     externals:[{
-        'xmlhttprequest': true, // 'xmlhttprequest': '{XMLHttpRequest:XMLHttpRequest}',
-        'path': true,
-        'fs': true,
-        'crypto': true,
-        'mkdirp': true,
-        'jscu': true,
+        'js-crypto-utils': true,
+        'js-encoding-utils': true,
+        'bson': true,
         'buffer': true,
-        'cbytes': true,
-        'assertArrays': true,
-        'cjson': true
+        'js': true,
+
+
+
+
     }],
     plugins:[
         new webpack.optimize.LimitChunkCountPlugin({

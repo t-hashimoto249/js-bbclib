@@ -8,7 +8,7 @@ export default class {
         if (asset_group_id != null ){
             this.asset_group_id = asset_group_id;
         }else{
-            this.asset_group_id = null;
+            this.asset_group_id = new Buffer();
         }
 
         this.pointers = [];
@@ -17,11 +17,11 @@ export default class {
 
     show_relation(){
         console.log("asset_group_id");
-        console.log(this.asset_group_id);
+        console.log(this.asset_group_id.toString("hex"));
         if( this.pointers.length > 0){
             console.log("pointers");
             for(let i = 0; i < this.pointers.length; i++ ){
-                console.log(this.pointers[i]);
+                console.log(this.pointers[i].show_pointer());
             }
         }
 

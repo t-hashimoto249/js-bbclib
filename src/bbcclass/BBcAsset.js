@@ -1,6 +1,6 @@
 import jscu from "js-crypto-utils";
 import * as para from '../parameter.js';
-import * as helper from '../helper.js';
+
 
 
 let BSON = require('bson');
@@ -10,13 +10,13 @@ export default class {
     constructor(user_id){
         this.id_length = para.DefaultLength.BBcOne;
         this.user_id = user_id; // byte
-        this.asset_id = null; // byte
-        this.nonce = null; // byte
+        this.asset_id = new Buffer(); // byte
+        this.nonce = new Buffer(); // byte
         this.asset_file_size = 0; // int
-        this.asset_file = null; //byte
-        this.asset_file_digest = null; //byte
+        this.asset_file = new Buffer(); //byte
+        this.asset_file_digest = new Buffer(); //byte
         this.asset_body_size = 0; //int
-        this.asset_body = null; // byte
+        this.asset_body = new Buffer(); // byte
 
     }
 
@@ -24,7 +24,7 @@ export default class {
         console.log("---------showAsset--------");
         if (this.asset_id != null){
             console.log("this.asset_id");
-            helper.print_bin(this.asset_id);
+           //console.log(this.asset_id.toString("hex"));
         }
         console.log("this.user_id");
         console.log(this.user_id.toString("hex"));
@@ -105,7 +105,6 @@ export default class {
     }
 
     serialize(for_digest_calculation){
-
         if (for_digest_calculation === true){
             return bson.serialize({
                 'user_id': this.user_id,

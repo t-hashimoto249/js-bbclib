@@ -45,8 +45,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         //'test/*.js'
-        'test/test_connection_bbcapp_and_bbccore.test.js'
-        //'test/test_bbclib.js'
+        //'test/test_connection_bbcapp_and_bbccore.test.js'
+        'test/test_bbclib.js'
     ],
 
 
@@ -61,6 +61,7 @@ module.exports = function(config) {
     preprocessors: {
         //'html/src/index.js': ["webpack"],
         'test/*.js': ["webpack"]
+        //'src/*.js': ["webpack"]
     },
 
     webpack: getWebpackConfig(),

@@ -6,13 +6,13 @@ export default class {
         if (transaction_id != null){
             this.transaction_id = transaction_id;
         }else{
-            this.transaction_id = null;
+            this.transaction_id = new Buffer();
         }
 
         if (asset_id != null){
             this.asset_id = asset_id;
         }else{
-            this.asset_id = null;
+            this.asset_id = new Buffer();
         }
 
     }

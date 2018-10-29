@@ -28,10 +28,6 @@ import * as para from "../src/parameter.js"
 import * as helper from "../src/helper";
 */
 
-
-
-
-
 const expect = chai.expect;
 
 let BSON = require('bson');

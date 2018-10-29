@@ -7,6 +7,7 @@ import BBcEvent from './BBcEvent.js';
 import BBcCrossRef from './BBcCrossRef';
 import KeyPair from "./KeyPair.js";
 import * as para from '../parameter.js';
+import * as helper from '../helper.js';
 import pako from "pako";
 
 let BSON = require('bson');
@@ -264,7 +265,7 @@ export default class {
         }
 
         this.transaction_data = new Uint8Array(format_type_buffer.length + dat.length);
-        this.transaction_data.set(format_type_buffer);
+        this.transaction_data.set(helper.buffer_to_uint8array(format_type_buffer));
         this.transaction_data.set(dat,format_type_buffer.length);
 
         return this.transaction_data;

@@ -9,9 +9,9 @@ export default class {
     show_cross_rf(){
         console.log("crossref");
         console.log("domain_id");
-        console.log(this.domain_id);
+        console.log(this.domain_id.toString("hex"));
         console.log("transaction_id");
-        console.log(this.transaction_id);
+        console.log(this.transaction_id.toString("hex"));
     }
 
     set_domain_id(domain_id){
