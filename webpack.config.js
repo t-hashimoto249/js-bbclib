@@ -72,10 +72,6 @@ const webConfig = {
         'bson': true,
         'buffer': true,
         'js': true,
-
-
-
-
     }],
     plugins:[
         new webpack.optimize.LimitChunkCountPlugin({

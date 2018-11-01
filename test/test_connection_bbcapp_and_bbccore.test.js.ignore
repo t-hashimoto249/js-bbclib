@@ -1,11 +1,11 @@
 import chai from 'chai';
-import BBcWitness from '../src/bbcclass/BBcWitness.js';
-import BBcTransaction from '../src/bbcclass/BBcTransaction.js';
-import BBcAsset from '../src/bbcclass/BBcAsset.js';
-import BBcReference from '../src/bbcclass/BBcReference.js';
-import BBcSignature from '../src/bbcclass/BBcSignature.js';
-import BBcEvent from '../src/bbcclass/BBcEvent.js';
-import KeyPair from '../src/bbcclass/KeyPair.js';
+import BBcWitness from '../src/bbc_class/BBcWitness.js';
+import BBcTransaction from '../src/bbc_class/BBcTransaction.js';
+import BBcAsset from '../src/bbc_class/BBcAsset.js';
+import BBcReference from '../src/bbc_class/BBcReference.js';
+import BBcSignature from '../src/bbc_class/BBcSignature.js';
+import BBcEvent from '../src/bbc_class/BBcEvent.js';
+import KeyPair from '../src/bbc_class/KeyPair.js';
 import * as para from '../src/parameter.js'
 import * as helper from '../src/helper.js'
 import jscu from "js-crypto-utils";
