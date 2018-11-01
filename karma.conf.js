@@ -1,24 +1,14 @@
 // Karma configuration
-// Generated on Fri Jun 22 2018 20:31:11 GMT+0900 (JST)
-
-const webpackConfig = require('./webpack.config.js');
-const babelExtraPlugins = ['babel-plugin-istanbul'];
+// Generated on Wed Jun 13 2018 13:09:34 GMT+0900 (JST)
+const common = require('./webpack.common.js');
+const webpackConfig = require('./webpack.dev.js');
+// const babelExtraPlugins = ['babel-plugin-istanbul'];
 const getWebpackConfig = () => {
-    const config = webpackConfig(null, {mode: 'development'});
-    config.mode = 'development';
-    console.log(config);
-    delete config.entry;
-    delete config.output;
-    delete config.plugins;
+  const config = webpackConfig(null, {mode: 'development'});
+  delete config.entry;
+  delete config.output;
 
-    config.module.rules = config.module.rules.map( (elem) => {
-        if(elem.use[0].loader === 'babel-loader'){
-            elem.use[0].options.plugins.push(...babelExtraPlugins);
-        }
-        return elem;
-    });
-
-    return config;
+  return config;
 };
 
 
@@ -31,44 +21,35 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [
-        'mocha'
+    frameworks: ['mocha'],
 
-    ],
-
-    plugins: [
-        'karma-chrome-launcher',
-        'karma-mocha',
-        'karma-webpack'
-    ],
 
     // list of files / patterns to load in the browser
     files: [
-        //'test/*.js'
-        //'test/test_connection_bbcapp_and_bbccore.test.js'
-        'test/test_bbclib.js'
+      `./dist/${common.bundleName}`,
+      './test/**/*.spec.js'
     ],
 
 
     // list of files / patterns to exclude
     exclude: [
-      'test/*.swp'
     ],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        //'html/src/index.js': ["webpack"],
-        'test/*.js': ["webpack"]
-        //'src/*.js': ["webpack"]
+      './src/**/*.js': ['coverage'],
+      './test/**/*.spec.js': ['webpack']
     },
 
     webpack: getWebpackConfig(),
+
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['mocha', 'coverage'],
+    coverageReporter: { type: 'lcov' },
 
 
     // web server port
@@ -90,17 +71,23 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
-    //browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadless'],
+    // browsers: ['Chrome'],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity,
-
+    concurrency: Infinity
   });
 };
+
+
+
+
+
+
+
