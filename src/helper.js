@@ -1,8 +1,9 @@
-import BBcEvent from './bbcclass/BBcEvent';
-import BBcAsset from './bbcclass/BBcAsset';
-import BBcTransaction from './bbcclass/BBcTransaction';
-import BBcWitness from './bbcclass/BBcWitness';
-import BBcRelation from './bbcclass/BBcRelation';
+import { BBcEvent } from './bbc_class/BBcEvent';
+import { BBcAsset } from './bbc_class/BBcAsset';
+import { BBcTransaction } from './bbc_class/BBcTransaction';
+import { BBcWitness } from './bbc_class/BBcWitness';
+import { BBcRelation } from './bbc_class/BBcRelation';
+import { Buffer } from 'buffer';
 import jscu from 'js-crypto-utils';
 import jseu from 'js-encoding-utils';
 
@@ -70,35 +71,32 @@ export async function get_random_value(length) {
 }
 
 export async function create_pubkey_byte(pubkey) {
-  let byte_x = await jseu.encoder.decodeBase64Url(pubkey['x']);
-  let byte_y = await jseu.encoder.decodeBase64Url(pubkey['y']);
+  const byte_x = await jseu.encoder.decodeBase64Url(pubkey['x']);
+  const byte_y = await jseu.encoder.decodeBase64Url(pubkey['y']);
 
-  let pubkey_byte = new Buffer(65);
-  pubkey_byte[0] = 0x04;
+  const public_key= new Buffer(65);
+  public_key[0] = 0x04;
   for (let i = 0; i < 32; i++) {
-    pubkey_byte[i + 1] = byte_x[i];
-    pubkey_byte[i + 1 + 32] = byte_y[i];
+    public_key[i + 1] = byte_x[i];
+    public_key[i + 1 + 32] = byte_y[i];
   }
 
-  return pubkey_byte;
+  return public_key;
 }
 
 export async function create_asset(user_id) {
 
   let bbcAsset = new BBcAsset(user_id);
-
   await bbcAsset.set_random_nonce();
 
   let asset_file = new Buffer(32);
   for (let i = 0; i < 32; i++) {
     asset_file[i] = 0xFF & i;
   }
-
   let asset_body = new Buffer(32);
   for (let i = 0; i < 32; i++) {
     asset_body[i] = 0xFF & (i + 32);
   }
-
   await bbcAsset.add_asset(asset_file, asset_body);
 
   return bbcAsset;
@@ -110,8 +108,8 @@ export function buffer_to_uint8array(buf) {
     || buf.constructor === Uint8Array) {
     return buf;
   }
-  if (typeof buf === 'string') buf = Buffer(buf);
-  var a = new Uint8Array(buf.length);
+  if (typeof buf === 'string') buf = Buffer.from(buf);
+  let a = new Uint8Array(buf.length);
   for (var i = 0; i < buf.length; i++) a[i] = buf[i];
   return a;
 }

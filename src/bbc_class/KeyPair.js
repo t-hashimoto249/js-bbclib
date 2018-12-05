@@ -1,14 +1,15 @@
 import jscu from 'js-crypto-utils';
 import jseu from 'js-encoding-utils';
+import { Buffer } from 'buffer';
 
-export default class {
+export class KeyPair{
   constructor() {
     this.private_key = null;
     this.public_key = null;
   }
 
   async generate() {
-    let keys = await jscu.pkc.generateKey('EC', {namedCurve: 'P-256'});
+    const keys = await jscu.pkc.generateKey('EC', {namedCurve: 'P-256'});
     this.private_key = keys.privateKey;
     this.public_key = keys.publicKey;
     return true;
@@ -32,10 +33,10 @@ export default class {
   }
 
   async create_pubkey_byte(public_key) {
-    let byte_x = await jseu.encoder.decodeBase64Url(public_key['x']);
-    let byte_y = await jseu.encoder.decodeBase64Url(public_key['y']);
+    const byte_x = await jseu.encoder.decodeBase64Url(public_key['x']);
+    const byte_y = await jseu.encoder.decodeBase64Url(public_key['y']);
 
-    let public_key_byte = new Buffer(65);
+    const public_key_byte = new Buffer(65);
     public_key_byte[0] = 0x04;
     for (let i = 0; i < 32; i++) {
       public_key_byte[i + 1] = byte_x[i];

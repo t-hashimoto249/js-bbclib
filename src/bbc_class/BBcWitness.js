@@ -1,6 +1,6 @@
 import * as para from '../parameter.js';
 
-export default class {
+export class BBcWitness{
   constructor() {
     this.id_length = para.DefaultLength.BBcOne;
     this.transaction = null;

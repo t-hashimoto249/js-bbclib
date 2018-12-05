@@ -1,5 +1,3 @@
-import jscu from 'js-crypto-utils';
-
 const DefaultLength = {
   BBcSimple: 8,
   BBcOne: 32

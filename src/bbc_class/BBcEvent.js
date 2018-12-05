@@ -1,7 +1,7 @@
-import BBcAsset from './BBcAsset.js';
+import { BBcAsset } from './BBcAsset.js';
 import * as para from '../parameter.js';
 
-export default class {
+export class BBcEvent{
   constructor(asset_group_id) {
     this.id_length = para.DefaultLength.BBcOne;
     this.asset_group_id = asset_group_id;
@@ -87,7 +87,7 @@ export default class {
       'option_approver_num_numerator': this.option_approver_num_numerator,
       'option_approver_num_denominator': this.option_approver_num_denominator,
       'option_approvers': this.option_approvers,
-      'asset': asset
+      asset
     };
   }
 
@@ -98,7 +98,7 @@ export default class {
     this.option_approver_num_numerator = data['option_approver_num_numerator'];
     this.option_approver_num_denominator = data['option_approver_num_denominator'];
     this.option_approvers = data['option_approvers'];
-    let asset = data['asset'];
+    const asset = data['asset'];
     if (asset === null) {
       this.asset = null;
     } else {

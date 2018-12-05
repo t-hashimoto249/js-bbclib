@@ -1,20 +1,20 @@
 import * as para from '../parameter.js';
+import { Buffer } from 'buffer';
 
-export default class {
+export class BBcPointer{
   constructor(transaction_id, asset_id) {
     this.id_length = para.DefaultLength.BBcOne;
     if (transaction_id != null) {
       this.transaction_id = transaction_id;
     } else {
-      this.transaction_id = new Buffer();
+      this.transaction_id = new Buffer( this.id_length );
     }
 
     if (asset_id != null) {
       this.asset_id = asset_id;
     } else {
-      this.asset_id = new Buffer();
+      this.asset_id = new Buffer( this.id_length );
     }
-
   }
 
   show_pointer() {

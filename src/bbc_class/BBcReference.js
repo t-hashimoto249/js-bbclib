@@ -1,11 +1,12 @@
 import * as para from '../parameter.js';
 import * as helper from '../helper.js';
+import { Buffer } from 'buffer';
 
-export default class {
+export class BBcReference{
   constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref) {
     this.id_length = para.DefaultLength.BBcOne;
     this.asset_group_id = asset_group_id;
-    this.transaction_id = new Buffer();
+    this.transaction_id = new Buffer(this.id_length);
     this.transaction = transaction;
     this.ref_transaction = ref_transaction;
     this.event_index_in_ref = event_index_in_ref;
@@ -23,13 +24,13 @@ export default class {
     this.ref_transaction = ref_transaction;
     try {
 
-      let evt = ref_transaction.events[this.event_index_in_ref];
-      for (let i = 0; i < evt.mandatory_approvers.length(); i++) {
+      const evt = ref_transaction.events[this.event_index_in_ref];
+      for (let i = 0; i < evt.mandatory_approvers.length; i++) {
         this.sig_indices.append(this.transaction.get_sig_index(evt.mandatory_approvers[i]));
       }
 
       for (let i = 0; i < evt.option_approver_num_numerator.length(); i++) {
-        let dummy_id = helper.get_random_value(4);
+        const dummy_id = helper.get_random_value(4);
         this.option_sig_ids.append(dummy_id);
         this.sig_indices.append(this.transaction.get_sig_index(dummy_id));
         this.mandatory_approvers = evt.mandatory_approvers;

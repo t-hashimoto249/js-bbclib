@@ -1,11 +1,11 @@
 import jscu from 'js-crypto-utils';
-import BBcWitness from './BBcWitness.js';
-import BBcReference from './BBcReference.js';
-import BBcSignature from './BBcSignature.js';
-import BBcRelation from './BBcRelation.js';
-import BBcEvent from './BBcEvent.js';
-import BBcCrossRef from './BBcCrossRef';
-import KeyPair from './KeyPair.js';
+import { BBcWitness } from './BBcWitness.js';
+import { BBcReference } from './BBcReference.js';
+import { BBcSignature } from './BBcSignature.js';
+import { BBcRelation } from './BBcRelation.js';
+import { BBcEvent } from './BBcEvent.js';
+import { BBcCrossRef } from './BBcCrossRef';
+import { KeyPair } from './KeyPair.js';
 import * as para from '../parameter.js';
 import * as helper from '../helper.js';
 import pako from 'pako';
@@ -15,7 +15,7 @@ let bson = new BSON();
 
 let date = new Date();
 
-export default class {
+export class BBcTransaction{
 
   constructor(version) {
     this.format_type = para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB;
@@ -37,54 +37,38 @@ export default class {
   }
 
   show_str() {
-    console.log('show_str');
-    console.log('format_type');
-    console.log(this.format_type);
-    console.log('id_length');
-    console.log(this.id_length);
-    console.log('version');
-    console.log(this.version);
-    console.log('timestamp');
-    console.log(this.timestamp);
+    console.log('format_type :',this.format_type);
+    console.log('id_length :', this.id_length);
+    console.log('version :',this.version);
+    console.log('timestamp :',this.timestamp);
     if (this.events != null && this.events.length > 0) {
       console.log('events');
       for (let i = 0; i < this.events.length; i++) {
-        console.log(this.events[i].show_event());
+        console.log('event[', i, '] :', this.events[i].show_event());
       }
     }
-    console.log('references');
-    console.log(this.references);
-    console.log('relations');
-    console.log(this.relations);
-    console.log('witness');
+    console.log('references :',this.references);
+    console.log('relations :',this.relations);
     if (this.witness !== null) {
       console.log(this.witness.show_str());
     } else {
       console.log(this.witness);
     }
 
-    console.log('cross_ref');
-    console.log(this.cross_ref);
-    console.log('signatures');
-    console.log(this.signatures);
+    console.log('cross_ref :',this.cross_ref);
+    console.log('signatures :',this.signatures);
 
     if (this.signatures != null && this.signatures.length > 0) {
-      console.log('signatures length');
-      console.log(this.signatures.length);
+      console.log('signatures length :',this.signatures.length);
       console.log(this.signatures[0].show_sig());
     } else {
       console.log(this.signatures);
     }
-    console.log('userid_sigidx_mapping');
-    console.log(this.userid_sigidx_mapping);
-    console.log('transaction_id');
-    console.log(this.transaction_id.toString('hex'));
-    console.log('transaction_base_digest');
-    console.log(this.transaction_base_digest.toString('hex'));
-    console.log('transaction_data');
-    console.log(this.transaction_data);
-    console.log('asset_group_ids');
-    console.log(this.asset_group_ids);
+    console.log('userid_sigidx_mapping :',this.userid_sigidx_mapping);
+    console.log('transaction_id :',this.transaction_id.toString('hex'));
+    console.log('transaction_base_digest :',this.transaction_base_digest.toString('hex'));
+    console.log('transaction_data :',this.transaction_data);
+    console.log('asset_group_ids :',this.asset_group_ids);
   }
 
   add_parts(event, reference, relation, witness, cross_ref) {
@@ -164,7 +148,7 @@ export default class {
 
   get_sig_index(user_id) {
     if (this.userid_sigidx_mapping[user_id] == null) {
-      let sig_index_obj = Object.keys(this.userid_sigidx_mapping);
+      const sig_index_obj = Object.keys(this.userid_sigidx_mapping);
       this.userid_sigidx_mapping[user_id] = sig_index_obj.length;
       this.signatures.push(new BBcSignature(para.KeyType.ECDSA_P256v1));
     }
@@ -173,7 +157,7 @@ export default class {
 
   add_signature(user_id, signature) {
     if (user_id in this.userid_sigidx_mapping) {
-      let idx = this.userid_sigidx_mapping[user_id];
+      const idx = this.userid_sigidx_mapping[user_id];
       this.signatures[idx] = signature;
       return true;
     } else {
@@ -188,7 +172,7 @@ export default class {
 
   async set_transaction_id() {
     this.target_serialize = new Uint8Array(await this.serialize(true, false));
-    let id = await jscu.hash.compute(this.target_serialize, 'SHA-256');
+    const id = await jscu.hash.compute(this.target_serialize, 'SHA-256');
     this.transaction_id = id.slice(0, this.id_length);
     return this.transaction_id;
   }
@@ -198,15 +182,15 @@ export default class {
     if (this.witness != null) {
       witness = this.witness.serialize();
     }
-    let event_list = [];
+    const event_list = [];
     for (let i = 0; i < this.events.length; i++) {
       event_list.push(this.events[i].serialize());
     }
-    let ref_list = [];
+    const ref_list = [];
     for (let i = 0; i < this.references.length; i++) {
       ref_list.push(this.references[i].serialize());
     }
-    let relation_list = [];
+    const relation_list = [];
     for (let i = 0; i < this.relations.length; i++) {
       relation_list.push(this.relations[i].serialize());
     }
@@ -215,7 +199,7 @@ export default class {
       tx_cross_ref = this.cross_ref.serialize();
     }
 
-    let tx_base = {
+    const tx_base = {
       'header': {
         'version': this.version,
         'timestamp': this.timestamp,
@@ -232,19 +216,19 @@ export default class {
       cross_ref = this.cross_ref.serialize();
     }
 
-    let target = bson.serialize(tx_base, {});
+    const target = bson.serialize(tx_base, {});
     this.transaction_base_digest = new Buffer(await jscu.hash.compute(target, 'SHA-256'));
 
     if (for_id === true) {
       return bson.serialize({
         'tx_base': this.transaction_base_digest,
-        'cross_ref': cross_ref
+        cross_ref
       }, {});
     }
 
     tx_base['cross_ref'] = tx_cross_ref;
 
-    let signature_list = [];
+    const signature_list = [];
     for (let i = 0; i < this.signatures.length; i++) {
       signature_list.push(this.signatures[i].serialize());
     }
@@ -254,7 +238,7 @@ export default class {
       'signatures': signature_list
     }, {});
 
-    let format_type_buffer = new Buffer(2);
+    const format_type_buffer = new Buffer(2);
     format_type_buffer[1] = 0xff & 0x00;
     format_type_buffer[0] = 0xff & this.format_type;
 
@@ -272,7 +256,7 @@ export default class {
   }
 
   async deserialize(data) {
-    let format = data[0];
+    const format = data[0];
     if (format === para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB) {
       data = Buffer.from(pako.inflate(data.slice(2, data.length)));
 
@@ -281,11 +265,10 @@ export default class {
 
     } else {
       return false;
-
     }
 
-    let bson_data = bson.deserialize(data, {});
-    let tx_base = bson_data['transaction_base'];
+    const bson_data = bson.deserialize(data, {});
+    const tx_base = bson_data['transaction_base'];
     this.version = tx_base['header']['version'];
     this.timestamp = tx_base['header']['timestamp'];
     this.id_length = tx_base['header']['id_length'];
@@ -293,7 +276,7 @@ export default class {
 
     if (tx_base['events'].length > 0) {
       for (let i = 0; i < tx_base["events"].length; i++) {
-        let event = new BBcEvent();
+        const event = new BBcEvent();
         event.deserialize(tx_base['events'][i]);
         this.events.push(event);
       }
@@ -301,8 +284,8 @@ export default class {
 
     this.references = [];
     if (tx_base['references'].length > 0) {
-      for (let i = 0; i < tx_base["references"].length; i++) {
-        let ref = new BBcReference(null, null, null, null);
+      for (let i = 0; i < tx_base['references'].length; i++) {
+        const ref = new BBcReference(null, null, null, null);
         ref.deserialize(tx_base['references'][i]);
         this.references.push(ref);
       }
@@ -310,8 +293,8 @@ export default class {
 
     this.relations = [];
     if (tx_base['relations'].length > 0) {
-      for (let i = 0; i < tx_base["relations"].length; i++) {
-        let rtn = new BBcRelation();
+      for (let i = 0; i < tx_base['relations'].length; i++) {
+        const rtn = new BBcRelation();
         rtn.deserialize(tx_base['relations'][i]);
         this.relations.push(rtn);
       }
@@ -321,23 +304,21 @@ export default class {
       this.witness = new BBcWitness();
       this.witness.transaction = this;
       this.witness.deserialize(tx_base['witness']);
-      console.log('witness');
-      console.log(this.witness);
     } else {
       this.witness = null;
     }
 
     if (tx_base['cross_ref']) {
       this.cross_ref = new BBcCrossRef();
-      this.cross_ref.deserialize(cross_ref);
+      this.cross_ref.deserialize(tx_base['cross_ref']);
     } else {
       this.cross_ref = null;
     }
 
     this.signatures = [];
     if (bson_data['signatures']) {
-      for (let i = 0; i < bson_data["signatures"].length; i++) {
-        let sig = new BBcSignature(2);
+      for (let i = 0; i < bson_data['signatures'].length; i++) {
+        const sig = new BBcSignature(2);
         await sig.deserialize(bson_data['signatures'][i]);
         this.signatures.push(sig);
       }
@@ -363,8 +344,8 @@ export default class {
       }
     }
 
-    let sig = new BBcSignature(para.KeyType.ECDSA_P256v1);
-    let s = await key_pair.sign(await this.digest());
+    const sig = new BBcSignature(para.KeyType.ECDSA_P256v1);
+    const s = await key_pair.sign(await this.digest());
     if (s === null) {
       return null;
     }

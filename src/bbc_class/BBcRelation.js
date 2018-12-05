@@ -1,14 +1,15 @@
-import BBcAsset from './BBcAsset.js';
-import BBcPointer from './BBcPointer.js';
+import { BBcAsset } from './BBcAsset.js';
+import { BBcPointer } from './BBcPointer.js';
 import * as para from '../parameter.js';
+import { Buffer } from 'buffer';
 
-export default class {
+export class BBcRelation{
   constructor(asset_group_id) {
     this.id_length = para.DefaultLength.BBcOne;
     if (asset_group_id != null) {
       this.asset_group_id = asset_group_id;
     } else {
-      this.asset_group_id = new Buffer();
+      this.asset_group_id = new Buffer(this.id_length);
     }
 
     this.pointers = [];
@@ -53,7 +54,7 @@ export default class {
       asset = this.asset.serialize();
     }
 
-    let pointer = [];
+    const pointer = [];
     if (this.pointers.length > 0) {
       for (let i = 0; i < this.pointers.length; i++) {
         pointer.push(this.pointers[i].serialize());
@@ -63,22 +64,22 @@ export default class {
     return {
       'asset_group_id': this.asset_group_id,
       'pointers': pointer,
-      'asset': asset
+      asset
     };
   }
 
   deserialize(data) {
     this.asset_group_id = data['asset_group_id'];
-    let ptrdat = data['pointers'];
+    const ptrdat = data['pointers'];
     if (ptrdat.length > 0) {
       for (let i = 0; i < ptrdat.length; i++) {
-        let ptr = new BBcPointer(null, null);
+        const ptr = new BBcPointer(null, null);
         ptr.deserialize(ptrdat[i]);
         this.pointers.push(ptr);
       }
     }
 
-    let assetdat = data['asset'];
+    const assetdat = data['asset'];
     if (assetdat != null) {
 
       this.asset = new BBcAsset(null);

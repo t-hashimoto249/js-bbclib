@@ -1,4 +1,4 @@
-export default class {
+export class BBcCrossRef{
   constructor(domain_id, transaction_id) {
     this.domain_id = domain_id; // byte
     this.transaction_id = transaction_id; //byte
