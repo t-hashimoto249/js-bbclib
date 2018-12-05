@@ -28,7 +28,7 @@ module.exports = function(config) {
     files: [
       `./dist/${common.bundleName}`,
       './test/**/*.spec.js',
-      './test/test_bbclib.js',
+      //'./test/.spec.js',
 
     ],
 
