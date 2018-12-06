@@ -26,7 +26,7 @@ export class BBcEvent{
 
     if (this.mandatory_approvers.length > 0) {
       for (let i = 0; i < this.mandatory_approvers.length; i++) {
-        console.log('mandatory_approvers[', i, '] :',(this.mandatory_approvers[i].toString('hex'));
+        console.log('mandatory_approvers[', i, '] :', this.mandatory_approvers[i].toString('hex'));
       }
     }
 
