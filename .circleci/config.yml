@@ -23,9 +23,9 @@ jobs:
           command: yarn install
 
       # run tests!
-      - run: npm run test && ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls
+      - run: npm run test
 
-      # - run: yarn karma
+      - run: yarn karma
 
       - store_artifacts:
           path: ./coverage
