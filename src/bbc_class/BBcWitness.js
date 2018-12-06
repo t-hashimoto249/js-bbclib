@@ -10,7 +10,6 @@ export class BBcWitness{
 
   show_str() {
     console.log('this.transaction :',this.transaction);
-
     for (let i = 0; i < this.user_ids.length; i++) {
       console.log('this.user_ids[', i, '] :',this.user_ids[i].toString('hex'));
     }
