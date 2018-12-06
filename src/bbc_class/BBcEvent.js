@@ -16,33 +16,26 @@ export class BBcEvent{
   show_event() {
     console.log('------show_event-------');
 
-    console.log('id_length');
-    console.log(this.id_length);
-    console.log('asset_group_id');
-    console.log(this.asset_group_id.toString('hex'));
-    console.log('reference_indices');
+    console.log('id_length :',this.id_length);
+    console.log('asset_group_id :',this.asset_group_id.toString('hex'));
     if (this.reference_indices.length > 0) {
       for (let i = 0; i < this.reference_indices.length; i++) {
-        console.log(this.reference_indices[i]);
+        console.log('reference_indices[', i, '] :',this.reference_indices[i]);
       }
     }
 
-    console.log('mandatory_approvers');
     if (this.mandatory_approvers.length > 0) {
       for (let i = 0; i < this.mandatory_approvers.length; i++) {
-        console.log(this.mandatory_approvers[i].toString('hex'));
+        console.log('mandatory_approvers[', i, '] :',(this.mandatory_approvers[i].toString('hex'));
       }
     }
 
-    console.log('option_approver_num_numerator');
-    console.log(this.option_approver_num_numerator);
-    console.log('option_approver_num_denominator');
-    console.log(this.option_approver_num_denominator);
-    console.log('option_approvers');
-    console.log(this.option_approvers);
+    console.log('option_approver_num_numerator :',this.option_approver_num_numerator);
+    console.log('option_approver_num_denominator :',this.option_approver_num_denominator);
+    console.log('option_approvers :',this.option_approvers);
     if (this.asset != null) {
-      console.log('this.asset');
-      this.asset.show_asset();
+      console.log('asset :', this.asset.show_asset());
+
     }
     console.log('------show_event end-------');
   }

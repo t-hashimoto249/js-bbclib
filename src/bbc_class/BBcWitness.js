@@ -9,16 +9,13 @@ export class BBcWitness{
   }
 
   show_str() {
-    console.log('this.transaction');
-    console.log(this.transaction);
-    console.log('this.user_ids');
-    //console.log(this.user_ids);
+    console.log('this.transaction :',this.transaction);
+
     for (let i = 0; i < this.user_ids.length; i++) {
-      console.log(this.user_ids[i].toString('hex'));
+      console.log('this.user_ids[', i, '] :',this.user_ids[i].toString('hex'));
     }
-    console.log('this.sig_indices');
     for (let i = 0; i < this.sig_indices.length; i++) {
-      console.log(this.sig_indices[i]);
+      console.log('this.sig_indices[', i, '] :',this.sig_indices[i]);
     }
   }
 

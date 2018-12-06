@@ -17,12 +17,10 @@ export class BBcRelation{
   }
 
   show_relation() {
-    console.log('asset_group_id');
-    console.log(this.asset_group_id.toString('hex'));
+    console.log('asset_group_id :',this.asset_group_id.toString('hex'));
     if (this.pointers.length > 0) {
-      console.log('pointers');
       for (let i = 0; i < this.pointers.length; i++) {
-        console.log(this.pointers[i].show_pointer());
+        console.log('pointers[',i,'] :',this.pointers[i].show_pointer());
       }
     }
 
