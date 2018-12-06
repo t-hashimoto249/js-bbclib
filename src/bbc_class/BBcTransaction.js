@@ -10,10 +10,9 @@ import * as para from '../parameter.js';
 import * as helper from '../helper.js';
 import pako from 'pako';
 
-let BSON = require('bson');
-let bson = new BSON();
-
-let date = new Date();
+const BSON = require('bson');
+const bson = new BSON();
+const date = new Date();
 
 export class BBcTransaction{
 
@@ -208,7 +207,7 @@ export class BBcTransaction{
       'events': event_list,
       'references': ref_list,
       'relations': relation_list,
-      'witness': witness
+      witness
     };
 
     let cross_ref = null;
@@ -275,7 +274,7 @@ export class BBcTransaction{
     this.events = [];
 
     if (tx_base['events'].length > 0) {
-      for (let i = 0; i < tx_base["events"].length; i++) {
+      for (let i = 0; i < tx_base['events'].length; i++) {
         const event = new BBcEvent();
         event.deserialize(tx_base['events'][i]);
         this.events.push(event);

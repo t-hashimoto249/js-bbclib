@@ -1,5 +1,5 @@
 /**
- * webpack.config.js
+ * webpack.common.js
  */
 
 const common = require('./webpack.common.js');

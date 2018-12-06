@@ -18,10 +18,8 @@ export class BBcPointer{
   }
 
   show_pointer() {
-    console.log('transaction_id');
-    console.log(this.transaction_id.toString('hex'));
-    console.log('asset_id');
-    console.log(this.asset_id.toString('hex'));
+    console.log('transaction_id',this.transaction_id.toString('hex'));
+    console.log('asset_id',this.asset_id.toString('hex'));
   }
 
   set_transaction_id(transaction_id) {

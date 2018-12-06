@@ -8,7 +8,7 @@ import jscu from 'js-crypto-utils';
 import jseu from 'js-encoding-utils';
 
 export async function make_transaction(user_id, event_num, ref_num, witness) {
-  let txobj = await get_new_transaction(user_id, event_num, ref_num, witness);
+  const txobj = await get_new_transaction(user_id, event_num, ref_num, witness);
   if (event_num > 0) {
     for (let i = 0; i < event_num; i++) {
       txobj.events[i].add_reference_indices(i);
@@ -21,17 +21,16 @@ export async function make_transaction(user_id, event_num, ref_num, witness) {
 }
 
 export async function sign_and_add_signature(transaction, key_pair) {
-  let sig = await transaction.sign(null, null, key_pair);
+  const sig = await transaction.sign(null, null, key_pair);
   transaction.add_signature(transaction.user_id, sig);
-  return;
 }
 
 export async function get_new_transaction(user_id, event_num, relation_num, witness) {
-  let transaction = new BBcTransaction(0);
+  const transaction = new BBcTransaction(0);
   if (event_num > 0) {
     for (let i = 0; i < event_num; i++) {
-      let evt = new BBcEvent(null);
-      let ast = new BBcAsset(null);
+      const evt = new BBcEvent(null);
+      const ast = new BBcAsset(null);
       ast.add_user_id(user_id);
       await ast.digest();
       evt.add_asset(ast);
@@ -53,10 +52,10 @@ export async function get_new_transaction(user_id, event_num, relation_num, witn
 
 function hexStringToByte(str) {
   if (!str) {
-    return new Buffer();
+    return new Buffer(0);
   }
 
-  let a = [];
+  const a = [];
   for (let i = 0, len = str.length; i < len; i += 2) {
     a.push(parseInt(str.substr(i, 2), 16));
   }
@@ -66,8 +65,7 @@ function hexStringToByte(str) {
 
 export async function get_random_value(length) {
   const msg = await jscu.random.getRandomBytes(length);
-  const d = await jscu.hash.compute(msg, 'SHA-256');
-  return d;
+  return await jscu.hash.compute(msg, 'SHA-256');
 }
 
 export async function create_pubkey_byte(pubkey) {
@@ -86,14 +84,14 @@ export async function create_pubkey_byte(pubkey) {
 
 export async function create_asset(user_id) {
 
-  let bbcAsset = new BBcAsset(user_id);
+  const bbcAsset = new BBcAsset(user_id);
   await bbcAsset.set_random_nonce();
 
-  let asset_file = new Buffer(32);
+  const asset_file = new Buffer(32);
   for (let i = 0; i < 32; i++) {
     asset_file[i] = 0xFF & i;
   }
-  let asset_body = new Buffer(32);
+  const asset_body = new Buffer(32);
   for (let i = 0; i < 32; i++) {
     asset_body[i] = 0xFF & (i + 32);
   }
@@ -109,7 +107,7 @@ export function buffer_to_uint8array(buf) {
     return buf;
   }
   if (typeof buf === 'string') buf = Buffer.from(buf);
-  let a = new Uint8Array(buf.length);
-  for (var i = 0; i < buf.length; i++) a[i] = buf[i];
+  const a = new Uint8Array(buf.length);
+  for (let i = 0; i < buf.length; i++) a[i] = buf[i];
   return a;
 }

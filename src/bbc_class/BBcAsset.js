@@ -19,27 +19,16 @@ export class BBcAsset{
   }
 
   show_asset() {
-    console.log('---------showAsset--------');
     if (this.asset_id != null) {
-      console.log('this.asset_id');
-      //console.log(this.asset_id.toString("hex"));
+      console.log('this.asset_id :',this.asset_id.toString("hex"));
     }
-    console.log('this.user_id');
-    console.log(this.user_id.toString('hex'));
-    console.log('this.nonce');
-    console.log(this.nonce.toString('hex'));
-    console.log('this.asset_file_size');
-    console.log(this.asset_file_size);
-    console.log('this.asset_file');
-    console.log(this.asset_file.toString('hex'));
-    console.log('this.asset_file_digest');
-    console.log(this.asset_file_digest.toString('hex'));
-    console.log('this.asset_body_size');
-    console.log(this.asset_body_size);
-    console.log('this.asset_body');
-    console.log(this.asset_body.toString('hex'));
-    console.log('--------------------------');
-
+    console.log('this.user_id :', this.user_id.toString('hex'));
+    console.log('this.nonce :', this.nonce.toString('hex'));
+    console.log('this.asset_file_size :',this.asset_file_size);
+    console.log('this.asset_file :',this.asset_file.toString('hex'));
+    console.log('this.asset_file_digest :',this.asset_file_digest.toString('hex'));
+    console.log('this.asset_body_size', this.asset_body_size);
+    console.log('this.asset_body :',this.asset_body.toString('hex'));
   }
 
   async set_random_nonce() {
