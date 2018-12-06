@@ -14,7 +14,6 @@ const BBcFormat = {
   FORMAT_BSON: 1,
   FORMAT_BSON_COMPRESS_BZ2: 2,
   FORMAT_BSON_COMPRESS_ZLIB: 3
-
 };
 
 export {DefaultLength, KeyType, BBcFormat};

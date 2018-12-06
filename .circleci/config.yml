@@ -1,0 +1,74 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+# https://circleci.com/blog/publishing-npm-packages-using-circleci-2-0/
+version: 2
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:latest-browsers
+
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - run:
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
+
+      - run:
+          name: 'package install'
+          command: yarn install
+
+      # run tests!
+      - run: npm run test && ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls
+
+      # - run: yarn karma
+
+      - store_artifacts:
+          path: ./coverage
+          destination: coverage-report
+
+      # to share workspase among workflow jobs
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+
+  publish:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      #- run:
+      #    name: Authenticate with registry
+      #    command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+      #- run:
+      #    name: Build production module
+      #    command: npm run build
+      #- run:
+      #    name: Publish package
+      #    command: npm publish
+
+      #- run:
+      #    name: Build API documentation webpage
+      #    command: npm run docs
+
+
+workflows:
+  version: 2
+  test-publish:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*/
+      #- publish:
+      #    requires:
+      #    - test
+      #    filters:
+      #      tags:
+      #        only: /^v[0-9]+(\.[0-9]+)*/
+      #      branches:
+      #        ignore: /.*/
