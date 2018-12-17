@@ -10,8 +10,7 @@ import * as para from '../parameter.js';
 import * as helper from '../helper.js';
 import pako from 'pako';
 
-const BSON = require('bson');
-const bson = new BSON();
+const bson = require('bson');
 const date = new Date();
 
 export class BBcTransaction{

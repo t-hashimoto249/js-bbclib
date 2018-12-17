@@ -2,8 +2,8 @@ import jscu from 'js-crypto-utils';
 import * as para from '../parameter.js';
 import { Buffer } from 'buffer';
 
-const BSON = require('bson');
-const bson = new BSON();
+const bson = require('bson');
+//const bson = new BSON();
 
 export class BBcAsset{
   constructor(user_id) {
