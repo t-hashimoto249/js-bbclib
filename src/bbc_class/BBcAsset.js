@@ -63,7 +63,7 @@ export class BBcAsset{
 
   async digest() {
     const target = this.get_digest();
-    this.asset_id = Buffer.from(new Buffer(await jscu.hash.compute(target, 'SHA-256')).slice(0, this.id_length));
+    this.asset_id = Buffer.from(Buffer.from(await jscu.hash.compute(target, 'SHA-256')).slice(0, this.id_length));
     return this.asset_id;
   }
 

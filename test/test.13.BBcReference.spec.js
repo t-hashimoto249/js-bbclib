@@ -32,5 +32,4 @@ describe(`${envName}: Test BBcPointer`, () => {
 
   });
 
-
 });
