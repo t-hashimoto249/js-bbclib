@@ -24,7 +24,7 @@ describe(`${envName}: Test BBcSignature`, () => {
     await key_pair.generate();
 
     const sig = new Buffer(8);
-    await bbcSignature.add(sig, key_pair.public_key);
+    await bbcSignature.add(sig, key_pair.public_key['_jwk']);
     const signature_serialize = bbcSignature.serialize();
     const signature_deserialize = new bbclib.BBcSignature(2);
     await signature_deserialize.deserialize(signature_serialize);
