@@ -1,6 +1,9 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    ":timezone(Asia/Tokyo)",
+    ":preserveSemverRanges",
+    ":automergePatch"
   ],
   "automerge": true,
   "major": {
@@ -14,9 +17,7 @@
   },
   "labels": ["update-dependencies"],
   "schedule": [
-    "after 9pm every weekday",
-    "every weekend",
-    "before 11am every weekday"
+    "before 8am on Monday"
   ]
 
 }
