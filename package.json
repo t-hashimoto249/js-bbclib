@@ -70,7 +70,7 @@
     "bson": "^3.0.0",
     "buffer": "^5.1.0",
     "cross-env": "^5.2.0",
-    "js-crypto-utils": "^0.10.1",
+    "js-crypto-utils": "^0.14.0",
     "js-encoding-utils": "^0.3.0",
     "jsdom": "^13.0.0"
   },
