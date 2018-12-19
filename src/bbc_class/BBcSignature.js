@@ -47,22 +47,20 @@ export class BBcSignature{
     this.signature = signature;
   }
 
-  serialize() {
-    //const pubkey_len = this.pubkey_byte.length * 8;
-    //const signature_len = this.signature.length * 8;
+  pack() {
 
     let binary_data = [];
 
     binary_data = binary_data.concat(Array.from(helper.hbo(this.key_type,4)));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.pubkey_byte.length, 4)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.pubkey_byte.length * 8, 4)));
     binary_data = binary_data.concat(Array.from(this.pubkey_byte));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.signature.length, 4)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.signature.length * 8, 4)));
     binary_data = binary_data.concat(Array.from(this.signature));
 
     return new Uint8Array(binary_data);
   }
 
-  async deserialize(data) {
+  async unpack(data) {
     let value_length = 0;
     let pos_s = 0;
     let pos_e = 4; // uint32
@@ -74,7 +72,7 @@ export class BBcSignature{
     console.log("pubkey_len:",value_length);
     if (value_length > 0) {
       pos_s = pos_e;
-      pos_e = pos_e + value_length;
+      pos_e = pos_e + (value_length / 8);
       this.pubkey_byte = data.slice(pos_s, pos_e);
     }
 
@@ -84,7 +82,7 @@ export class BBcSignature{
     console.log("signature_len:",value_length);
     if (value_length > 0) {
       pos_s = pos_e;
-      pos_e = pos_e + value_length;
+      pos_e = pos_e + (value_length / 8 );
       this.signature = data.slice(pos_s, pos_e);
     }
 
