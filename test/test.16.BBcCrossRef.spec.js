@@ -31,7 +31,7 @@ describe(`${envName}: Test BBcCrossRef`, () => {
 
     const serialize_bbcCrossRef = bbcCrossRef.pack();
     const bbcCrossRef_deserialize = new bbclib.BBcCrossRef(null, null);
-    bbcCrossRef_deserialize.unpack(serialize_bbcCrossRef);
+    await bbcCrossRef_deserialize.unpack(serialize_bbcCrossRef);
 
     expect_uint8Array(bbcCrossRef.domain_id, bbcCrossRef_deserialize.domain_id);
     expect_uint8Array(bbcCrossRef.transaction_id, bbcCrossRef_deserialize.transaction_id);
