@@ -13,22 +13,22 @@ describe(`${envName}: Test BBcRelation`, () => {
   it('serialize and deserialize', async () => {
     console.log('***********************');
     console.log('Test for BBcRelation Class');
-    const asset_id = Buffer.from(await jscu.random.getRandomBytes(32));
+    const asset_id = await jscu.random.getRandomBytes(32);
 
     const bbcRelation = new bbclib.BBcRelation(asset_id);
-    bbcRelation.add_asset_group_id(new Buffer(8));
+    bbcRelation.add_asset_group_id(new Uint8Array(8));
 
-    const user_id = Buffer.from(await jscu.random.getRandomBytes(32));
+    const user_id = await jscu.random.getRandomBytes(32);
     const bbcAsset = new bbclib.BBcAsset(user_id);
 
     await bbcAsset.set_random_nonce();
 
-    const asset_file = new Buffer(32);
+    const asset_file = new Uint8Array(32);
     for(let i = 0; i < 32; i++){
       asset_file[i] = 0xFF & i;
     }
 
-    const asset_body = new Buffer(32);
+    const asset_body = new Uint8Array(32);
     for(let i = 0; i < 32; i++){
       asset_body[i] = 0xFF & (i + 32);
     }
@@ -37,7 +37,7 @@ describe(`${envName}: Test BBcRelation`, () => {
 
     //    let bbcAsset = await helper.create_asset(user_id);
 
-    const transaction_id = Buffer.from(await jscu.random.getRandomBytes(32));
+    const transaction_id =await jscu.random.getRandomBytes(32);
 
     bbcRelation.set_asset(bbcAsset);
     bbcRelation.add_pointer(new bbclib.BBcPointer(transaction_id, asset_id));

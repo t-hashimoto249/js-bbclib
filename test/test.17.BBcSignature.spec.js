@@ -49,7 +49,7 @@ describe(`${envName}: Test BBcSignature`, () => {
 
     await signature_unpack.unpack(signature_data);
 
-    signature_unpack.show_sig();
+    //signature_unpack.show_sig();
     expect(jseu.encoder.arrayBufferToHexString(signature_unpack.signature)).to.be.eq( "e98b77e2f1bba5c65645aaa9aa7cc7b057240cc49f7e47c09a1a2a93b5cbf249d2c85fb4cb674670369a484d4e3c1e51680a22b8b95caaebdada752bf16e9675" );
     expect(jseu.encoder.arrayBufferToHexString(signature_unpack.pubkey_byte)).to.be.eq( "043750d6dcb679608cb533e93cfb22ec2df17e10a61c79f113bc1651d02caed51640121e53e4ec83effe9804df5f39521a28a1ba1f41d3198ffd54999fbcb60dd7" );
 

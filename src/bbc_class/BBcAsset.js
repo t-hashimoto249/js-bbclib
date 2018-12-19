@@ -4,8 +4,6 @@ import jseu from 'js-encoding-utils';
 import * as para from '../parameter.js';
 import * as helper from '../helper';
 
-const bson = require('bson');
-
 export class BBcAsset{
   constructor(user_id) {
     this.set_length(para.DefaultLength.BBcOne); // int
