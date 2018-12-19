@@ -14,45 +14,44 @@ describe(`${envName}: Test BBcAsset`, () => {
   console.log('***********************');
   console.log('Test for BBcAsset Class.');
 
-  it('serialize and deserialize with file and body', async () => {
+  it('pack and unpack with file and body', async () => {
     const user_id = await jscu.random.getRandomBytes(32);
     const bbcAsset = await helper.create_asset(user_id);
-    const asset_serialize = await bbcAsset.serialize();
-    console.log(asset_serialize);
-    const asset_deserialise = new bbclib.BBcAsset(user_id);
-    await asset_deserialise.deserialize(asset_serialize);
+    const asset_pack = await bbcAsset.pack();
+    const asset_unpack = new bbclib.BBcAsset(user_id);
+    await asset_unpack.unpack(asset_pack);
 
     //console.log("----------");
     //bbcAsset.show_asset();
     //console.log("----------");
-    //asset_deserialise.show_asset();
+    //asset_unpack.show_asset();
 
-    expect_uint8Array(bbcAsset.asset_id,asset_deserialise.asset_id);
-    expect_uint8Array(bbcAsset.user_id,asset_deserialise.user_id);
-    expect_uint8Array(bbcAsset.nonce,asset_deserialise.nonce);
-    expect_uint8Array(bbcAsset.asset_file_digest,asset_deserialise.asset_file_digest);
-    expect_uint8Array(bbcAsset.asset_body,asset_deserialise.asset_body);
-    expect( bbcAsset.asset_file_size).to.be.eq(asset_deserialise.asset_file_size);
-    expect( bbcAsset.asset_body_size).to.be.eq(asset_deserialise.asset_body_size);
-    expect( bbcAsset.asset_body_type).to.be.eq(asset_deserialise.asset_body_type);
+    expect_uint8Array(bbcAsset.asset_id,asset_unpack.asset_id);
+    expect_uint8Array(bbcAsset.user_id,asset_unpack.user_id);
+    expect_uint8Array(bbcAsset.nonce,asset_unpack.nonce);
+    expect_uint8Array(bbcAsset.asset_file_digest,asset_unpack.asset_file_digest);
+    expect_uint8Array(bbcAsset.asset_body,asset_unpack.asset_body);
+    expect( bbcAsset.asset_file_size).to.be.eq(asset_unpack.asset_file_size);
+    expect( bbcAsset.asset_body_size).to.be.eq(asset_unpack.asset_body_size);
+    expect( bbcAsset.asset_body_type).to.be.eq(asset_unpack.asset_body_type);
 
   });
 
   it('serialize and deserialize without file', async () => {
     const user_id = await jscu.random.getRandomBytes(32);
     const bbcAsset = await helper.create_asset_without_file(user_id);
-    const asset_serialize = await bbcAsset.serialize();
-    const asset_deserialise = new bbclib.BBcAsset(user_id);
-    await asset_deserialise.deserialize(asset_serialize);
+    const asset_pack = await bbcAsset.pack();
+    const asset_unpack = new bbclib.BBcAsset(user_id);
+    await asset_unpack.unpack(asset_pack);
 
-    expect_uint8Array(bbcAsset.asset_id,asset_deserialise.asset_id);
-    expect_uint8Array(bbcAsset.user_id,asset_deserialise.user_id);
-    expect_uint8Array(bbcAsset.nonce,asset_deserialise.nonce);
-    expect_uint8Array(bbcAsset.asset_file_digest,asset_deserialise.asset_file_digest);
-    expect_uint8Array(bbcAsset.asset_body,asset_deserialise.asset_body);
-    expect( bbcAsset.asset_file_size).to.be.eq(asset_deserialise.asset_file_size);
-    expect( bbcAsset.asset_body_size).to.be.eq(asset_deserialise.asset_body_size);
-    expect( bbcAsset.asset_body_type).to.be.eq(asset_deserialise.asset_body_type);
+    expect_uint8Array(bbcAsset.asset_id,asset_unpack.asset_id);
+    expect_uint8Array(bbcAsset.user_id,asset_unpack.user_id);
+    expect_uint8Array(bbcAsset.nonce,asset_unpack.nonce);
+    expect_uint8Array(bbcAsset.asset_file_digest,asset_unpack.asset_file_digest);
+    expect_uint8Array(bbcAsset.asset_body,asset_unpack.asset_body);
+    expect( bbcAsset.asset_file_size).to.be.eq(asset_unpack.asset_file_size);
+    expect( bbcAsset.asset_body_size).to.be.eq(asset_unpack.asset_body_size);
+    expect( bbcAsset.asset_body_type).to.be.eq(asset_unpack.asset_body_type);
 
   });
 
@@ -81,31 +80,31 @@ describe(`${envName}: Test BBcAsset`, () => {
     await bbcAsset.add_asset(null, asset_body);
     const digest = await bbcAsset.digest();
 
-    expect(jseu.encoder.arrayBufferToHexString(digest)).to.be.eq('9d908ecfb6b256def8b49a7c504e6c889c4b0e41fe6ce3e01863dd7b61a20aa0');
+    expect(jseu.encoder.arrayBufferToHexString(digest)).to.be.eq('5feda19fb60af18c8c1d0e4af7d613726ec71cc9f6067c924ce2d081a61aa6d1');
   });
 
   it('load asset hex string ', async () => {
     const asset_hex_string = '200036335a38ca83d7594d96d00f50288644cc180c47d870eae291185bf8a111dbba20005e64bb946e38aa0dd3dce77abe38f017834bf1e32c2de1ced4bce443b84765022000a3bc8fa47aed0ab75817e516a52a17df27c1233c0eab5a97bc1049b8285481b7000000000000120074657374537472696e673132333435585858';
     const asset_data = helper.fromHexString(asset_hex_string);
     const user_id = await jscu.random.getRandomBytes(32);
-    const asset_deserialise = new bbclib.BBcAsset(user_id);
-    await asset_deserialise.deserialize(asset_data);
+    const asset_unpack = new bbclib.BBcAsset(user_id);
+    await asset_unpack.unpack(asset_data);
 
-    //asset_deserialise.show_asset();
+    const digest = await asset_unpack.digest();
+    //asset_unpack.show_asset();
 
-    expect(jseu.encoder.arrayBufferToHexString(asset_deserialise.asset_id)).to.be.eq( "36335a38ca83d7594d96d00f50288644cc180c47d870eae291185bf8a111dbba" );
-    expect(jseu.encoder.arrayBufferToHexString(asset_deserialise.user_id)).to.be.eq( "5e64bb946e38aa0dd3dce77abe38f017834bf1e32c2de1ced4bce443b8476502" );
-    expect(jseu.encoder.arrayBufferToHexString(asset_deserialise.nonce)).to.be.eq( "a3bc8fa47aed0ab75817e516a52a17df27c1233c0eab5a97bc1049b8285481b7" );
-    expect(jseu.encoder.arrayBufferToHexString(asset_deserialise.asset_file_digest)).to.be.eq( "" );
-    expect(jseu.encoder.arrayBufferToHexString(asset_deserialise.asset_body)).to.be.eq( "74657374537472696e673132333435585858" );
+    expect(jseu.encoder.arrayBufferToHexString(digest)).to.be.eq( "36335a38ca83d7594d96d00f50288644cc180c47d870eae291185bf8a111dbba" );
+    expect(jseu.encoder.arrayBufferToHexString(asset_unpack.asset_id)).to.be.eq( "36335a38ca83d7594d96d00f50288644cc180c47d870eae291185bf8a111dbba" );
+    expect(jseu.encoder.arrayBufferToHexString(asset_unpack.user_id)).to.be.eq( "5e64bb946e38aa0dd3dce77abe38f017834bf1e32c2de1ced4bce443b8476502" );
+    expect(jseu.encoder.arrayBufferToHexString(asset_unpack.nonce)).to.be.eq( "a3bc8fa47aed0ab75817e516a52a17df27c1233c0eab5a97bc1049b8285481b7" );
+    expect(jseu.encoder.arrayBufferToHexString(asset_unpack.asset_file_digest)).to.be.eq( "" );
+    expect(jseu.encoder.arrayBufferToHexString(asset_unpack.asset_body)).to.be.eq( "74657374537472696e673132333435585858" );
 
-    expect( asset_deserialise.asset_file_size).to.be.eq(0);
-    expect( asset_deserialise.asset_body_size).to.be.eq(18);
-    expect( asset_deserialise.asset_body_type).to.be.eq(0);
-
+    expect( asset_unpack.asset_file_size).to.be.eq(0);
+    expect( asset_unpack.asset_body_size).to.be.eq(18);
+    expect( asset_unpack.asset_body_type).to.be.eq(0);
 
   });
-
 
 });
 
