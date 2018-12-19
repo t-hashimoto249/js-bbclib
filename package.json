@@ -42,7 +42,7 @@
     "babel-loader": "8.0.4",
     "babel-plugin-istanbul": "5.1.0",
     "babel-plugin-transform-remove-console": "6.9.4",
-    "chai": "4.1.2",
+    "chai": "4.2.0",
     "chai-arrays": "2.0.0",
     "chai-bytes": "0.1.1",
     "circular-json": "0.5.4",
