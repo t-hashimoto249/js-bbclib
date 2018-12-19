@@ -23,12 +23,11 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha'],
 
-
     // list of files / patterns to load in the browser
     files: [
       `./dist/${common.bundleName}`,
       './test/**/*.spec.js',
-      //'./test/.spec.js',
+      //'./test/test.11.BBcAsset.spec.js'
 
     ],
 

@@ -4,6 +4,7 @@ import jscu from 'js-crypto-utils';
 import { Buffer } from 'buffer';
 
 import {getTestEnv} from './prepare.js';
+import jseu from 'js-encoding-utils';
 const env = getTestEnv();
 const bbclib = env.library;
 const envName = env.envName;
@@ -51,13 +52,25 @@ describe(`${envName}: Test BBcEvent`, () => {
     expect(bbcEvent.option_approver_num_numerator).to.be.eq(event_deserialise.option_approver_num_numerator);
     expect(bbcEvent.option_approver_num_denominator).to.be.eq(event_deserialise.option_approver_num_denominator);
     expect(bbcEvent.option_approvers).to.be.eq(event_deserialise.option_approvers);
-    expect(bbcEvent.asset.asset_id).to.be.eq(event_deserialise.asset.asset_id);
-    expect(bbcEvent.asset.user_id).to.be.eq(event_deserialise.asset.user_id);
-    expect(bbcEvent.asset.nonce).to.be.eq(event_deserialise.asset.nonce);
+
+    expect_uint8Array(bbcEvent.asset.asset_id,event_deserialise.asset.asset_id);
+    expect_uint8Array(bbcEvent.asset.user_id,event_deserialise.asset.user_id);
+    expect_uint8Array(bbcEvent.asset.nonce,event_deserialise.asset.nonce);
+    expect_uint8Array(bbcEvent.asset.asset_file_digest,event_deserialise.asset.asset_file_digest);
+    expect_uint8Array(bbcEvent.asset.asset_body,event_deserialise.asset.asset_body);
+
+    //expect(bbcEvent.asset.asset_id).to.be.eq(event_deserialise.asset.asset_id);
+    //expect(bbcEvent.asset.user_id).to.be.eq(event_deserialise.asset.user_id);
+    //expect(bbcEvent.asset.nonce).to.be.eq(event_deserialise.asset.nonce);
     expect(bbcEvent.asset.asset_file_size).to.be.eq(event_deserialise.asset.asset_file_size);
-    expect(bbcEvent.asset.asset_file_digest).to.be.eq(event_deserialise.asset.asset_file_digest);
+    //expect(bbcEvent.asset.asset_file_digest).to.be.eq(event_deserialise.asset.asset_file_digest);
+    expect(bbcEvent.asset.asset_body_type).to.be.eq(event_deserialise.asset.asset_body_type);
     expect(bbcEvent.asset.asset_body_size).to.be.eq(event_deserialise.asset.asset_body_size);
-    expect(bbcEvent.asset.asset_body).to.be.eq(event_deserialise.asset.asset_body);
+    //expect(bbcEvent.asset.asset_body).to.be.eq(event_deserialise.asset.asset_body);
 
   });
 });
+
+function expect_uint8Array(bin1, bin2){
+  expect(jseu.encoder.arrayBufferToHexString(bin1)).to.be.eq(jseu.encoder.arrayBufferToHexString(bin2));
+}

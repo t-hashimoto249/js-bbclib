@@ -87,15 +87,29 @@ export async function create_asset(user_id) {
   const bbcAsset = new BBcAsset(user_id);
   await bbcAsset.set_random_nonce();
 
-  const asset_file = new Buffer(32);
+  const asset_file = new Uint8Array(32);
   for (let i = 0; i < 32; i++) {
     asset_file[i] = 0xFF & i;
   }
-  const asset_body = new Buffer(32);
+  const asset_body = new Uint8Array(32);
   for (let i = 0; i < 32; i++) {
     asset_body[i] = 0xFF & (i + 32);
   }
   await bbcAsset.add_asset(asset_file, asset_body);
+
+  return bbcAsset;
+}
+
+export async function create_asset_without_file(user_id) {
+
+  const bbcAsset = new BBcAsset(user_id);
+  await bbcAsset.set_random_nonce();
+
+  const asset_body = new Uint8Array(32);
+  for (let i = 0; i < 32; i++) {
+    asset_body[i] = 0xFF & (i + 32);
+  }
+  await bbcAsset.add_asset(null, asset_body);
 
   return bbcAsset;
 }
@@ -110,4 +124,32 @@ export function buffer_to_uint8array(buf) {
   const a = new Uint8Array(buf.length);
   for (let i = 0; i < buf.length; i++) a[i] = buf[i];
   return a;
+}
+
+export function hbo(num, len){
+  const arr = new Uint8Array(len);
+  for(let i=0; i<len; i++) arr[i] = 0xFF && (num >> (i*8));
+  return arr;
+}
+
+export function hboToInt32(bin){
+  let num = 0;
+  num = num + (bin[0]);
+  num = num + (bin[1] * 256);
+  num = num + (bin[2] * 256 * 256);
+  num = num + (bin[3] * 256 * 256 * 256);
+
+  return num;
+}
+
+export function hboToInt16(bin){
+  let num = 0;
+  num = num + (bin[0]);
+  num = num + (bin[1] * 256);
+
+  return num;
+}
+
+export function fromHexString (hexString){
+  return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
 }
