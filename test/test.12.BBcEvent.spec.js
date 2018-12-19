@@ -33,8 +33,6 @@ describe(`${envName}: Test BBcEvent`, () => {
 
     await bbcAsset.add_asset(asset_file, asset_body);
 
-    //let bbcAsset = await helper.create_asset(user_id);
-
     bbcEvent.add_asset(bbcAsset);
     bbcEvent.add_asset_group_id(asset_group_id);
     bbcEvent.add_mandatory_approver(user_id);
@@ -59,14 +57,9 @@ describe(`${envName}: Test BBcEvent`, () => {
     expect_uint8Array(bbcEvent.asset.asset_file_digest,event_deserialise.asset.asset_file_digest);
     expect_uint8Array(bbcEvent.asset.asset_body,event_deserialise.asset.asset_body);
 
-    //expect(bbcEvent.asset.asset_id).to.be.eq(event_deserialise.asset.asset_id);
-    //expect(bbcEvent.asset.user_id).to.be.eq(event_deserialise.asset.user_id);
-    //expect(bbcEvent.asset.nonce).to.be.eq(event_deserialise.asset.nonce);
     expect(bbcEvent.asset.asset_file_size).to.be.eq(event_deserialise.asset.asset_file_size);
-    //expect(bbcEvent.asset.asset_file_digest).to.be.eq(event_deserialise.asset.asset_file_digest);
     expect(bbcEvent.asset.asset_body_type).to.be.eq(event_deserialise.asset.asset_body_type);
     expect(bbcEvent.asset.asset_body_size).to.be.eq(event_deserialise.asset.asset_body_size);
-    //expect(bbcEvent.asset.asset_body).to.be.eq(event_deserialise.asset.asset_body);
 
   });
 });

@@ -2,7 +2,6 @@ import { KeyPair } from './KeyPair.js';
 import jseu from 'js-encoding-utils';
 import * as helper from '../helper.js';
 
-
 import { Buffer } from 'buffer';
 
 export class BBcSignature{
@@ -13,7 +12,6 @@ export class BBcSignature{
     this.pubkey_byte = null;
     this.keypair = null;
     this.not_initialized = true;
-
   }
 
   show_sig() {

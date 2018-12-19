@@ -18,6 +18,7 @@ describe(`${envName}: Test BBcAsset`, () => {
     const user_id = await jscu.random.getRandomBytes(32);
     const bbcAsset = await helper.create_asset(user_id);
     const asset_serialize = await bbcAsset.serialize();
+    console.log(asset_serialize);
     const asset_deserialise = new bbclib.BBcAsset(user_id);
     await asset_deserialise.deserialize(asset_serialize);
 
