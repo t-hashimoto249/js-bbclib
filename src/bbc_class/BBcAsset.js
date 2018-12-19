@@ -98,32 +98,14 @@ export class BBcAsset{
   get_digest() {
 
     let binary_data = [];
-    binary_data = binary_data.concat(Array.from(this.user_id));
-    binary_data = binary_data.concat(Array.from(this.nonce));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_file_size)));
-    if (this.asset_file_size > 0 && this.asset_file_size != null){
-      binary_data = binary_data.concat(Array.from(this.asset_file_digest));
-    }
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_body_type)));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_body_size)));
-    if (this.asset_body_size > 0 && this.asset_body != null){
-      binary_data = binary_data.concat(Array.from(this.asset_body));
-    }
 
-    return new Uint8Array(binary_data);
-  }
-
-  serialize() {
-
-    let binary_data = [];
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_id.length, 2)));
-    binary_data = binary_data.concat(Array.from(this.asset_id));
     binary_data = binary_data.concat(Array.from(helper.hbo(this.user_id.length, 2)));
     binary_data = binary_data.concat(Array.from(this.user_id));
     binary_data = binary_data.concat(Array.from(helper.hbo(this.nonce.length, 2)));
     binary_data = binary_data.concat(Array.from(this.nonce));
     binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_file_size, 4)));
-    if (this.asset_file_size > 0 ){
+    if (this.asset_file_size > 0){
+      binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_file_digest.length, 2)));
       binary_data = binary_data.concat(Array.from(this.asset_file_digest));
     }
     binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_body_type, 2)));
@@ -135,11 +117,34 @@ export class BBcAsset{
     return new Uint8Array(binary_data);
   }
 
-  deserialize(data) {
-    let value_length = 0;
+  pack() {
+
+    let binary_data = [];
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_id.length, 2)));
+    binary_data = binary_data.concat(Array.from(this.asset_id));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.user_id.length, 2)));
+    binary_data = binary_data.concat(Array.from(this.user_id));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.nonce.length, 2)));
+    binary_data = binary_data.concat(Array.from(this.nonce));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_file_size, 4)));
+    if (this.asset_file_size > 0){
+      binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_file_digest.length, 2)));
+      binary_data = binary_data.concat(Array.from(this.asset_file_digest));
+    }
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_body_type, 2)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_body_size, 2)));
+    if (this.asset_body_size > 0 && this.asset_body != null){
+      binary_data = binary_data.concat(Array.from(this.asset_body));
+    }
+
+    return new Uint8Array(binary_data);
+  }
+
+  unpack(data) {
+
     let pos_s = 0;
     let pos_e = 2; // uint16
-    value_length =  helper.hboToInt16(data.slice(pos_s,pos_e));
+    let value_length =  helper.hboToInt16(data.slice(pos_s,pos_e));
 
     if (value_length > 0){
       pos_s = pos_e;
@@ -170,10 +175,16 @@ export class BBcAsset{
     pos_e = pos_e + 4;  // uint32
     this.asset_file_size = helper.hboToInt32(data.slice(pos_s,pos_e));
 
-    if (this.asset_file_size > 0){
+    if ( this.asset_file_size !== 0){
       pos_s = pos_e;
-      pos_e = pos_e + this.asset_file_size;
-      this.asset_file_digest = data.slice(pos_s,pos_e);
+      pos_e = pos_e + 2;  // uint32
+      value_length = helper.hboToInt16(data.slice(pos_s,pos_e));
+
+      if (value_length > 0){
+        pos_s = pos_e;
+        pos_e = pos_e + this.asset_file_size;
+        this.asset_file_digest = data.slice(pos_s,pos_e);
+      }
     }
 
     pos_s = pos_e;
