@@ -12,7 +12,7 @@ const envName = env.envName;
 
 describe(`${envName}: Test BBcPointer`, () => {
 
-  it('serialize and deserialize', async () => {
+  it('pack and unpack', async () => {
     console.log('***********************');
     console.log('Test for BBcPointer Class');
 
@@ -21,12 +21,30 @@ describe(`${envName}: Test BBcPointer`, () => {
 
     const bbcPointer = new bbclib.BBcPointer(transaction_id, asset_id);
 
-    const serialize_bbcPointer = bbcPointer.serialize();
-    const bbcPointer_deserialize = new bbclib.BBcPointer(null, null);
-    bbcPointer_deserialize.deserialize(serialize_bbcPointer);
+    const pack_bbcPointer = bbcPointer.pack();
+    const bbcPointer_unpack = new bbclib.BBcPointer(null, null);
+    bbcPointer_unpack.unpack(pack_bbcPointer);
 
-    expect_uint8Array(bbcPointer.asset.transaction_id,bbcPointer_deserialize.transaction_id.asset_id);
-    expect_uint8Array(bbcPointer.asset.asset_id,bbcPointer_deserialize.asset.asset_id);
+    expect_uint8Array(bbcPointer.transaction_id,bbcPointer_unpack.transaction_id);
+    expect(bbcPointer.asset_id_existence,bbcPointer_unpack.asset_id_existence);
+    expect_uint8Array(bbcPointer.asset_id,bbcPointer_unpack.asset_id);
+
+  });
+
+  it('pack and unpack have not asset id', async () => {
+    console.log('***********************');
+    console.log('Test for BBcPointer Class');
+
+    const transaction_id = await jscu.random.getRandomBytes(32);
+
+    const bbcPointer = new bbclib.BBcPointer(transaction_id, null);
+
+    const pack_bbcPointer = bbcPointer.pack();
+    const bbcPointer_unpack = new bbclib.BBcPointer(null, null);
+    bbcPointer_unpack.unpack(pack_bbcPointer);
+
+    expect_uint8Array(bbcPointer.transaction_id,bbcPointer_unpack.transaction_id);
+    expect(bbcPointer.asset_id_existence,bbcPointer_unpack.asset_id_existence);
 
   });
 
@@ -34,11 +52,11 @@ describe(`${envName}: Test BBcPointer`, () => {
     const pointer_hex_string = '20003eb1bd439947eb762998e566ccc2e099c791118b2f40579cc4f7da2b5061b7f9010020008c2f9fd27c0044c83e64bc66162be45810cadb85e774fb9ab5eaf26ea68f7fa8';
     const pointer_data = helper.fromHexString(pointer_hex_string);
 
-    const bbcPointer_deserialize = new bbclib.BBcPointer(null, null);
-    await bbcPointer_deserialize.deserialize(pointer_data);
+    const bbcPointer_unpack = new bbclib.BBcPointer(null, null);
+    await bbcPointer_unpack.unpack(pointer_data);
 
-    expect(jseu.encoder.arrayBufferToHexString(bbcPointer_deserialize.domain_id)).to.be.eq( "3eb1bd439947eb762998e566ccc2e099c791118b2f40579cc4f7da2b5061b7f9" );
-    expect(jseu.encoder.arrayBufferToHexString(bbcPointer_deserialize.transaction_id)).to.be.eq( "8c2f9fd27c0044c83e64bc66162be45810cadb85e774fb9ab5eaf26ea68f7fa8" );
+    expect(jseu.encoder.arrayBufferToHexString(bbcPointer_unpack.asset_id)).to.be.eq( "8c2f9fd27c0044c83e64bc66162be45810cadb85e774fb9ab5eaf26ea68f7fa8" );
+    expect(jseu.encoder.arrayBufferToHexString(bbcPointer_unpack.transaction_id)).to.be.eq( "3eb1bd439947eb762998e566ccc2e099c791118b2f40579cc4f7da2b5061b7f9" );
 
   });
 
