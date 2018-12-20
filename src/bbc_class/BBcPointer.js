@@ -70,7 +70,7 @@ export class BBcPointer{
     this.asset_id_existence =  helper.hboToInt16(data.slice(pos_s,pos_e));
     if (this.asset_id_existence > 0) {
       pos_s = pos_e;
-      pos_e = pos_e + 2; //uint15
+      pos_e = pos_e + 2; //uint16
       value_length = helper.hboToInt16(data.slice(pos_s, pos_e));
 
       pos_s = pos_e;

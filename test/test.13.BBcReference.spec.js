@@ -14,7 +14,7 @@ describe(`${envName}: Test BBcPointer`, () => {
     console.log('***********************');
     console.log('Test for BBcReference Class.');
 
-    const asset_group_id = Buffer.from(await jscu.random.getRandomBytes(32));
+    const asset_group_id = await jscu.random.getRandomBytes(32);
     const transaction = Buffer.from(await jscu.random.getRandomBytes(32));
     const ref_transaction  = Buffer.from(await jscu.random.getRandomBytes(32));
     const event_index_in_ref  = Buffer.from(await jscu.random.getRandomBytes(32));
