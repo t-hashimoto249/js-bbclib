@@ -10,7 +10,7 @@ const envName = env.envName;
 
 describe(`${envName}: Test BBcRelation`, () => {
 
-  it('serialize and deserialize', async () => {
+  it('pack and unpack', async () => {
     console.log('***********************');
     console.log('Test for BBcRelation Class');
     const asset_id = await jscu.random.getRandomBytes(32);
