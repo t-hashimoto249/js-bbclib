@@ -61,14 +61,13 @@ export class BBcSignature{
   }
 
   async unpack(data) {
-    let value_length = 0;
     let pos_s = 0;
     let pos_e = 4; // uint32
     this.key_type =  helper.hboToInt32(data.slice(pos_s,pos_e));
 
     pos_s = pos_e;
     pos_e = pos_e + 4; // uint32
-    value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
+    let value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
 
     if (value_length > 0) {
       pos_s = pos_e;

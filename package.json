@@ -46,9 +46,11 @@
     "chai-arrays": "2.0.0",
     "chai-bytes": "0.1.1",
     "circular-json": "0.5.9",
+    "cross-env": "^5.2.0",
     "eslint": "5.9.0",
     "gulp-babel": "7.0.1",
     "isparta": "4.0.0",
+    "jsdom": "^13.0.0",
     "karma": "2.0.4",
     "karma-chrome-launcher": "2.2.0",
     "karma-cli": "1.0.1",
@@ -61,21 +63,16 @@
     "webpack": "4.12.1",
     "webpack-cli": "3.0.8",
     "webpack-common-shake": "2.1.0",
-    "webpack-merge": "4.1.4",
-    "cross-env": "^5.2.0",
-    "jsdom": "^13.0.0"
+    "webpack-merge": "4.1.4"
   },
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-transform-regenerator": "7.0.0",
     "@babel/runtime": "^7.1.2",
-    "bson": "^4.0.0",
-    "buffer": "^5.1.0",
+    "bn.js": "^4.11.8",
     "js-crypto-utils": "^0.14.0",
     "js-encoding-utils": "^0.3.0"
   },
   "description": "",
-  "browser": {
-
-  }
+  "browser": {}
 }

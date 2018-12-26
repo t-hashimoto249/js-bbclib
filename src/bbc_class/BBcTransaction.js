@@ -9,6 +9,7 @@ import { KeyPair } from './KeyPair.js';
 import * as para from '../parameter.js';
 import * as helper from '../helper.js';
 import jseu from 'js-encoding-utils';
+import BN from 'bn.js';
 
 const date = new Date();
 
@@ -18,9 +19,7 @@ export class BBcTransaction{
     this.format_type = para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB;
     this.id_length = para.DefaultLength.BBcOne;
     this.version = version;
-    this.timestamp = date.getTime(); //nano秒単位で記載
-    //this.timestamp = 1545288535676620000;
-
+    this.timestamp = (new BN(date.getTime()) ).mul(new BN(1000000)); //timestampはミリ秒なので nano秒へ変換
     this.events = [];
     this.references = [];
     this.relations = [];
@@ -29,7 +28,7 @@ export class BBcTransaction{
     this.signatures = [];
     this.userid_sigidx_mapping = {};
     this.transaction_id = new Uint8Array(0);
-    this.transaction_base_digest =  new Uint8Array(0);
+    this.transaction_base_digest = new Uint8Array(0);
     this.transaction_data = null;
     this.asset_group_ids = {};
     this.target_serialize = null;
@@ -174,9 +173,23 @@ export class BBcTransaction{
     return this.target_serialize;
   }
 
+  pack_cross_ref(){
+    let binary_data = [];
+    if (this.cross_ref !== null){
+      binary_data = binary_data.concat(Array.from(helper.hbo(1, 2)));
+      const packed_data = this.cross_ref.pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    } else {
+      binary_data = binary_data.concat(Array.from(helper.hbo(0, 2)));
+    }
+    return new Uint8Array(binary_data);
+  }
+
   async set_transaction_id() {
     this.target_serialize = await this.get_digest_for_transaction_id();
-    const id = await jscu.hash.compute(this.target_serialize, 'SHA-256');
+    this.transaction_base_digest = await jscu.hash.compute(this.target_serialize, 'SHA-256');
+    const id = await jscu.hash.compute(helper.concat(this.transaction_base_digest, this.pack_cross_ref() ), 'SHA-256');
     this.transaction_id = id.slice(0, this.id_length);
     return this.transaction_id;
   }
@@ -186,10 +199,10 @@ export class BBcTransaction{
     let binary_data = [];
 
     binary_data = binary_data.concat(Array.from(helper.hbo(this.version, 4)));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.timestamp, 8)));
+    binary_data = binary_data.concat( this.timestamp.toArray('big', 8) );
     binary_data = binary_data.concat(Array.from(helper.hbo(this.id_length, 2)));
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.events.length, 2)));
 
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.events.length, 2)));
     for (let i = 0; i < this.events.length; i++) {
       const packed_data = this.events[i].pack();
       binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
@@ -218,6 +231,7 @@ export class BBcTransaction{
     } else {
       binary_data = binary_data.concat(Array.from(helper.hbo(0, 2)));
     }
+
     return new Uint8Array(binary_data);
   }
 
@@ -226,13 +240,7 @@ export class BBcTransaction{
     let binary_data = [];
 
     binary_data = binary_data.concat(Array.from(helper.hbo(this.version, 4)));
-    console.log("timestamp:::::::",this.timestamp);
-    console.log("timestamp:::::::",typeof(this.timestamp));
-    binary_data = binary_data.concat(Array.from(helper.hbo2(this.timestamp, 8)));
-    //console.log("timestamp:::::::",typeof(this.timestamp));
-    console.log("timestamp hbo:::::::",jseu.encoder.arrayBufferToHexString(helper.hbo(this.timestamp, 8)));
-    console.log("timestamp hbo:::::::",helper.hbo(this.timestamp, 8));
-
+    binary_data = binary_data.concat( this.timestamp.toArray('big', 8) );
     binary_data = binary_data.concat(Array.from(helper.hbo(this.id_length, 2)));
 
     binary_data = binary_data.concat(Array.from(helper.hbo(this.events.length, 2)));
@@ -267,7 +275,7 @@ export class BBcTransaction{
 
     if (this.cross_ref !== null){
       binary_data = binary_data.concat(Array.from(helper.hbo(1, 2)));
-      const packed_data = this.cross_ref[i].pack();
+      const packed_data = this.cross_ref.pack();
       binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
       binary_data = binary_data.concat(Array.from(packed_data));
     } else {
@@ -291,29 +299,17 @@ export class BBcTransaction{
     let pos_e = 4; // uint32
     this.version = helper.hboToInt32(data.slice(pos_s, pos_e));
 
-    console.log('unpack version :',this.version);
-    console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
-
     pos_s = pos_e;
     pos_e = pos_e + 8;
-    this.timestamp = helper.hboToInt64(data.slice(pos_s, pos_e));
-    console.log('unpack timestamp :',this.timestamp);
-    console.log('unpack timestamp :',typeof(this.timestamp));
-    console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+    this.timestamp = new BN(data.slice(pos_s, pos_e));
 
     pos_s = pos_e;
     pos_e = pos_e + 2; // uint16
     this.id_length = helper.hboToInt16(data.slice(pos_s, pos_e));
-    //console.log('unpack id_length :', this.id_length);
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
-
 
     pos_s = pos_e;
     pos_e = pos_e + 2; // uint16
     const num_events = helper.hboToInt16(data.slice(pos_s, pos_e));
-
-    //console.log("de num_events:",num_events );
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
 
     if(num_events > 0){
       for (let i =0; i < num_events; i++){
@@ -324,6 +320,7 @@ export class BBcTransaction{
         pos_s = pos_e;
         pos_e = pos_e + event_length; // uint16
         const event_bin = data.slice(pos_s, pos_e);
+
         const event = new BBcEvent();
         event.unpack(event_bin);
         this.events.push(event);
@@ -334,16 +331,11 @@ export class BBcTransaction{
     pos_e = pos_e + 2; // uint16
     const num_reference = helper.hboToInt16(data.slice(pos_s, pos_e));
 
-    //console.log("de num_reference:",num_reference );
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
-
     if(num_reference > 0){
       for (let i =0; i < num_reference; i++){
         pos_s = pos_e;
         pos_e = pos_e + 4; // uint16
         const reference_length = helper.hboToInt32(data.slice(pos_s, pos_e));
-        //console.log("de reference_length:",reference_length );
-        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
 
         pos_s = pos_e;
         pos_e = pos_e + reference_length; // uint16
@@ -358,27 +350,17 @@ export class BBcTransaction{
     pos_e = pos_e + 2; // uint16
     const num_relation = helper.hboToInt16(data.slice(pos_s, pos_e));
 
-    //console.log("de num relation:",num_relation );
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
-
     if(num_relation > 0){
       for (let i =0; i < num_relation; i++){
         pos_s = pos_e;
         pos_e = pos_e + 4; // uint16
         const relation_length = helper.hboToInt32(data.slice(pos_s, pos_e));
-        //console.log("de relations length:", relation_length );
-        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
 
         pos_s = pos_e;
         pos_e = pos_e + relation_length; // uint16
         const relation_bin = data.slice(pos_s, pos_e);
         const rtn = new BBcRelation();
         rtn.unpack(relation_bin);
-        //console.log("de relations --------------------:",relation_length );
-        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
-
-        //rtn.show_relation();
-
         this.relations.push(rtn);
       }
     }
@@ -386,8 +368,6 @@ export class BBcTransaction{
     pos_s = pos_e;
     pos_e = pos_e + 2; // uint16
     const num_witness = helper.hboToInt16(data.slice(pos_s, pos_e));
-    //console.log("de num num_witness:",num_witness );
-    //console.log("de num num_witness:", data.slice(pos_s, pos_e ));
 
     if(num_witness > 0){
       for (let i =0; i < num_witness; i++){
@@ -401,7 +381,6 @@ export class BBcTransaction{
         const witness_bin = data.slice(pos_s, pos_e);
         this.witness = new BBcWitness();
         this.witness.unpack(witness_bin);
-        this.witness.show_str();
         this.witness.transaction = this;
       }
     }
@@ -409,9 +388,6 @@ export class BBcTransaction{
     pos_s = pos_e;
     pos_e = pos_e + 2; // uint16
     const num_crossref = helper.hboToInt16(data.slice(pos_s, pos_e));
-
-    //console.log("de num num_crossref:",num_crossref );
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
 
     if(num_crossref > 0){
       for (let i =0; i < num_crossref; i++){
@@ -432,21 +408,15 @@ export class BBcTransaction{
     pos_e = pos_e + 2; // uint16
     const num_signature = helper.hboToInt16(data.slice(pos_s, pos_e));
 
-    //console.log("de num num_signature:",num_signature );
-    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
     if(num_signature > 0){
       for (let i =0; i < num_signature; i++){
         pos_s = pos_e;
         pos_e = pos_e + 4; // uint16
         const signature_length = helper.hboToInt32(data.slice(pos_s, pos_e));
-        //console.log("de num signature_length:",signature_length );
-        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
 
         pos_s = pos_e;
         pos_e = pos_e + signature_length; // uint16
         const signature_bin = data.slice(pos_s, pos_e);
-        //console.log("de signature_bin:",signature_bin );
-        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
         const sig = new BBcSignature(2);
         await sig.unpack(signature_bin);
         this.signatures.push(sig);

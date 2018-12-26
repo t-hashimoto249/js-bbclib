@@ -129,31 +129,10 @@ export function buffer_to_uint8array(buf) {
 export function hbo(num, len){
   const arr = new Uint8Array(len);
   for(let i=0; i<len; i++){
-    arr[i] = 0xFF && (num >> (i*8));
-  }
-  return arr;
-}
-
-export function hbo(num, len){
-  const arr = new Uint8Array(len);
-  for(let i=0; i<len; i++){
     arr[i] = 0xFF && (Math.floor(num/Math.pow(256, i)));
   }
   return arr;
 }
-
-
-export function hbo_c(num, len){
-  const arr = new Uint8Array(len);
-  for(let i=0; i<len; i++) {
-
-    arr[i] = 0xFF && (num >> (i*8));
-
-
-  }
-  return arr;
-}
-
 
 export function hboToInt64(bin){
 
@@ -191,4 +170,17 @@ export function hboToInt16(bin){
 
 export function fromHexString (hexString){
   return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+}
+
+export function concat(buf1, buf2) {
+  // Checks for truthy values on both arrays
+  if(!buf1 && !buf2) throw 'Please specify valid arguments for parameters buf1 and buf2.';
+
+  if(!buf2 || buf2.length === 0) return buf1;
+  if(!buf1 || buf1.length === 0) return buf2;
+
+  var tmp = new Uint8Array(buf1.length + buf2.length);
+  tmp.set(new Uint8Array(buf1), 0);
+  tmp.set(new Uint8Array(buf2), buf1.length);
+  return tmp;
 }

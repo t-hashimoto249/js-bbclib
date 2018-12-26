@@ -1,7 +1,6 @@
 import { BBcAsset } from './BBcAsset.js';
 import { BBcPointer } from './BBcPointer.js';
 import * as para from '../parameter.js';
-import { Buffer } from 'buffer';
 import jseu from 'js-encoding-utils';
 import * as helper from '../helper';
 
@@ -11,7 +10,7 @@ export class BBcRelation{
     if (asset_group_id != null) {
       this.asset_group_id = asset_group_id;
     } else {
-      this.asset_group_id = new Buffer(this.id_length);
+      this.asset_group_id = new Uint8Array(this.id_length);
     }
 
     this.pointers = [];

@@ -34,10 +34,6 @@ describe(`${envName}: Test BBcWitness`, () => {
 
     await witness_load.unpack(s_witness);
 
-    witness.show_str();
-    console.log("+++++++++++++++++++");
-    witness_load.show_str();
-
     expect(witness_load.sig_indices[0]).to.be.eq(0);
     expect(witness_load.user_ids[0]).to.be.eql(user_id_0);
     expect(witness_load.sig_indices[1]).to.be.eq(1);
@@ -49,9 +45,6 @@ describe(`${envName}: Test BBcWitness`, () => {
     const witness_data = helper.fromHexString(witness_hex_string);
     const bbcWitness_deserialize = new bbclib.BBcWitness();
     await bbcWitness_deserialize.unpack(witness_data);
-
-    bbcWitness_deserialize.show_str();
-
 
     expect(bbcWitness_deserialize.sig_indices[0]).to.be.eq(0);
     const user_id_0_hex_string = '5e64bb946e38aa0dd3dce77abe38f017834bf1e32c2de1ced4bce443b8476502';
