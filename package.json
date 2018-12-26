@@ -49,7 +49,7 @@
     "cross-env": "^5.2.0",
     "eslint": "5.11.0",
     "gulp-babel": "7.0.1",
-    "isparta": "4.0.0",
+    "isparta": "4.1.1",
     "jsdom": "^13.0.0",
     "karma": "2.0.4",
     "karma-chrome-launcher": "2.2.0",
