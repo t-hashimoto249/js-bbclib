@@ -69,7 +69,7 @@ export class BBcSignature{
     pos_s = pos_e;
     pos_e = pos_e + 4; // uint32
     value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
-    console.log("pubkey_len:",value_length);
+
     if (value_length > 0) {
       pos_s = pos_e;
       pos_e = pos_e + (value_length / 8);
@@ -79,7 +79,7 @@ export class BBcSignature{
     pos_s = pos_e;
     pos_e = pos_e + 4; // uint32
     value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
-    console.log("signature_len:",value_length);
+
     if (value_length > 0) {
       pos_s = pos_e;
       pos_e = pos_e + (value_length / 8 );

@@ -8,9 +8,8 @@ import { BBcCrossRef } from './BBcCrossRef';
 import { KeyPair } from './KeyPair.js';
 import * as para from '../parameter.js';
 import * as helper from '../helper.js';
-import pako from 'pako';
+import jseu from 'js-encoding-utils';
 
-const bson = require('bson');
 const date = new Date();
 
 export class BBcTransaction{
@@ -19,7 +18,9 @@ export class BBcTransaction{
     this.format_type = para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB;
     this.id_length = para.DefaultLength.BBcOne;
     this.version = version;
-    this.timestamp = Math.floor(date.getTime() / 1000); //秒単位で記載
+    this.timestamp = date.getTime(); //nano秒単位で記載
+    //this.timestamp = 1545288535676620000;
+
     this.events = [];
     this.references = [];
     this.relations = [];
@@ -27,24 +28,28 @@ export class BBcTransaction{
     this.cross_ref = null;
     this.signatures = [];
     this.userid_sigidx_mapping = {};
-    this.transaction_id = null;
-    this.transaction_base_digest = null;
+    this.transaction_id = new Uint8Array(0);
+    this.transaction_base_digest =  new Uint8Array(0);
     this.transaction_data = null;
     this.asset_group_ids = {};
     this.target_serialize = null;
   }
 
   show_str() {
+    console.log('**************show_str*************** :');
+
     console.log('format_type :',this.format_type);
     console.log('id_length :', this.id_length);
     console.log('version :',this.version);
     console.log('timestamp :',this.timestamp);
-    if (this.events != null && this.events.length > 0) {
+
+    if (this.events.length > 0) {
       console.log('events');
       for (let i = 0; i < this.events.length; i++) {
         console.log('event[', i, '] :', this.events[i].show_event());
       }
     }
+
     console.log('references :',this.references);
     console.log('relations :',this.relations);
     if (this.witness !== null) {
@@ -63,10 +68,11 @@ export class BBcTransaction{
       console.log(this.signatures);
     }
     console.log('userid_sigidx_mapping :',this.userid_sigidx_mapping);
-    console.log('transaction_id :',this.transaction_id.toString('hex'));
-    console.log('transaction_base_digest :',this.transaction_base_digest.toString('hex'));
+    console.log('transaction_id :', jseu.encoder.arrayBufferToHexString(this.transaction_id));
+    console.log('transaction_base_digest :', jseu.encoder.arrayBufferToHexString(this.transaction_base_digest));
     console.log('transaction_data :',this.transaction_data);
     console.log('asset_group_ids :',this.asset_group_ids);
+
   }
 
   add_parts(event, reference, relation, witness, cross_ref) {
@@ -164,165 +170,289 @@ export class BBcTransaction{
   }
 
   async digest() {
-    this.target_serialize = await this.serialize(true, false);
+    this.target_serialize = await this.get_digest_for_transaction_id();
     return this.target_serialize;
   }
 
   async set_transaction_id() {
-    this.target_serialize = new Uint8Array(await this.serialize(true, false));
+    this.target_serialize = await this.get_digest_for_transaction_id();
     const id = await jscu.hash.compute(this.target_serialize, 'SHA-256');
     this.transaction_id = id.slice(0, this.id_length);
     return this.transaction_id;
   }
 
-  async serialize(for_id) {
-    let witness = null;
-    if (this.witness != null) {
-      witness = this.witness.serialize();
-    }
-    const event_list = [];
+  async get_digest_for_transaction_id(){
+
+    let binary_data = [];
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.version, 4)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.timestamp, 8)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.id_length, 2)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.events.length, 2)));
+
     for (let i = 0; i < this.events.length; i++) {
-      event_list.push(this.events[i].serialize());
+      const packed_data = this.events[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
     }
-    const ref_list = [];
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.references.length, 2)));
     for (let i = 0; i < this.references.length; i++) {
-      ref_list.push(this.references[i].serialize());
+      const packed_data = this.references[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
     }
-    const relation_list = [];
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.relations.length, 2)));
     for (let i = 0; i < this.relations.length; i++) {
-      relation_list.push(this.relations[i].serialize());
-    }
-    let tx_cross_ref = null;
-    if (this.cross_ref != null) {
-      tx_cross_ref = this.cross_ref.serialize();
+      const packed_data = this.relations[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
     }
 
-    const tx_base = {
-      'header': {
-        'version': this.version,
-        'timestamp': this.timestamp,
-        'id_length': this.id_length
-      },
-      'events': event_list,
-      'references': ref_list,
-      'relations': relation_list,
-      witness
-    };
-
-    let cross_ref = null;
-    if (this.cross_ref != null) {
-      cross_ref = this.cross_ref.serialize();
+    if (this.witness !== null){
+      binary_data = binary_data.concat(Array.from(helper.hbo(1, 2)));
+      const packed_data = this.witness.pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    } else {
+      binary_data = binary_data.concat(Array.from(helper.hbo(0, 2)));
     }
-
-    const target = bson.serialize(tx_base, {});
-    this.transaction_base_digest = new Buffer(await jscu.hash.compute(target, 'SHA-256'));
-
-    if (for_id === true) {
-      return bson.serialize({
-        'tx_base': this.transaction_base_digest,
-        cross_ref
-      }, {});
-    }
-
-    tx_base['cross_ref'] = tx_cross_ref;
-
-    const signature_list = [];
-    for (let i = 0; i < this.signatures.length; i++) {
-      signature_list.push(this.signatures[i].serialize());
-    }
-
-    let dat = bson.serialize({
-      'transaction_base': tx_base,
-      'signatures': signature_list
-    }, {});
-
-    const format_type_buffer = new Buffer(2);
-    format_type_buffer[1] = 0xff & 0x00;
-    format_type_buffer[0] = 0xff & this.format_type;
-
-    if (this.format_type === para.BBcFormat.FORMAT_BSON) {
-
-    } else if (this.format_type === para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB) {
-      dat = pako.deflate(dat);
-    }
-
-    this.transaction_data = new Uint8Array(format_type_buffer.length + dat.length);
-    this.transaction_data.set(helper.buffer_to_uint8array(format_type_buffer));
-    this.transaction_data.set(dat, format_type_buffer.length);
-
-    return this.transaction_data;
+    return new Uint8Array(binary_data);
   }
 
-  async deserialize(data) {
-    const format = data[0];
-    if (format === para.BBcFormat.FORMAT_BSON_COMPRESS_ZLIB) {
-      data = Buffer.from(pako.inflate(data.slice(2, data.length)));
+  async pack() {
 
-    } else if (format === para.BBcFormat.FORMAT_BSON) {
-      data = Buffer.from(data.slice(2, data.length));
+    let binary_data = [];
 
-    } else {
-      return false;
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.version, 4)));
+    console.log("timestamp:::::::",this.timestamp);
+    console.log("timestamp:::::::",typeof(this.timestamp));
+    binary_data = binary_data.concat(Array.from(helper.hbo2(this.timestamp, 8)));
+    //console.log("timestamp:::::::",typeof(this.timestamp));
+    console.log("timestamp hbo:::::::",jseu.encoder.arrayBufferToHexString(helper.hbo(this.timestamp, 8)));
+    console.log("timestamp hbo:::::::",helper.hbo(this.timestamp, 8));
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.id_length, 2)));
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.events.length, 2)));
+    for (let i = 0; i < this.events.length; i++) {
+      const packed_data = this.events[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
     }
 
-    const bson_data = bson.deserialize(data, {});
-    const tx_base = bson_data['transaction_base'];
-    this.version = tx_base['header']['version'];
-    this.timestamp = tx_base['header']['timestamp'];
-    this.id_length = tx_base['header']['id_length'];
-    this.events = [];
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.references.length, 2)));
+    for (let i = 0; i < this.references.length; i++) {
+      const packed_data = this.references[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    }
 
-    if (tx_base['events'].length > 0) {
-      for (let i = 0; i < tx_base['events'].length; i++) {
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.relations.length, 2)));
+    for (let i = 0; i < this.relations.length; i++) {
+      const packed_data = this.relations[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    }
+
+    if (this.witness !== null){
+      binary_data = binary_data.concat(Array.from(helper.hbo(1, 2)));
+      const packed_data = this.witness.pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    } else {
+      binary_data = binary_data.concat(Array.from(helper.hbo(0, 2)));
+    }
+
+    if (this.cross_ref !== null){
+      binary_data = binary_data.concat(Array.from(helper.hbo(1, 2)));
+      const packed_data = this.cross_ref[i].pack();
+      binary_data = binary_data.concat(Array.from(helper.hbo(packed_data.length,4)));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    } else {
+      binary_data = binary_data.concat(Array.from(helper.hbo(0, 2)));
+    }
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.signatures.length, 2)));
+    for (let i = 0; i < this.signatures.length; i++) {
+      const packed_data = this.signatures[i].pack();
+      binary_data = binary_data.concat(Array.from(packed_data.length));
+      binary_data = binary_data.concat(Array.from(packed_data));
+    }
+
+    return new Uint8Array(binary_data);
+
+  }
+
+  async unpack(data) {
+
+    let pos_s = 0;
+    let pos_e = 4; // uint32
+    this.version = helper.hboToInt32(data.slice(pos_s, pos_e));
+
+    console.log('unpack version :',this.version);
+    console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    pos_s = pos_e;
+    pos_e = pos_e + 8;
+    this.timestamp = helper.hboToInt64(data.slice(pos_s, pos_e));
+    console.log('unpack timestamp :',this.timestamp);
+    console.log('unpack timestamp :',typeof(this.timestamp));
+    console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    this.id_length = helper.hboToInt16(data.slice(pos_s, pos_e));
+    //console.log('unpack id_length :', this.id_length);
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_events = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    //console.log("de num_events:",num_events );
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    if(num_events > 0){
+      for (let i =0; i < num_events; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+        const event_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+
+        pos_s = pos_e;
+        pos_e = pos_e + event_length; // uint16
+        const event_bin = data.slice(pos_s, pos_e);
         const event = new BBcEvent();
-        event.deserialize(tx_base['events'][i]);
+        event.unpack(event_bin);
         this.events.push(event);
       }
     }
 
-    this.references = [];
-    if (tx_base['references'].length > 0) {
-      for (let i = 0; i < tx_base['references'].length; i++) {
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_reference = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    //console.log("de num_reference:",num_reference );
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    if(num_reference > 0){
+      for (let i =0; i < num_reference; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+        const reference_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+        //console.log("de reference_length:",reference_length );
+        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+        pos_s = pos_e;
+        pos_e = pos_e + reference_length; // uint16
+        const reference_bin = data.slice(pos_s, pos_e);
         const ref = new BBcReference(null, null, null, null);
-        ref.deserialize(tx_base['references'][i]);
+        ref.unpack(reference_bin);
         this.references.push(ref);
       }
     }
 
-    this.relations = [];
-    if (tx_base['relations'].length > 0) {
-      for (let i = 0; i < tx_base['relations'].length; i++) {
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_relation = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    //console.log("de num relation:",num_relation );
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    if(num_relation > 0){
+      for (let i =0; i < num_relation; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+        const relation_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+        //console.log("de relations length:", relation_length );
+        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+        pos_s = pos_e;
+        pos_e = pos_e + relation_length; // uint16
+        const relation_bin = data.slice(pos_s, pos_e);
         const rtn = new BBcRelation();
-        rtn.deserialize(tx_base['relations'][i]);
+        rtn.unpack(relation_bin);
+        //console.log("de relations --------------------:",relation_length );
+        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+        //rtn.show_relation();
+
         this.relations.push(rtn);
       }
     }
 
-    if (tx_base['witness']) {
-      this.witness = new BBcWitness();
-      this.witness.transaction = this;
-      this.witness.deserialize(tx_base['witness']);
-    } else {
-      this.witness = null;
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_witness = helper.hboToInt16(data.slice(pos_s, pos_e));
+    //console.log("de num num_witness:",num_witness );
+    //console.log("de num num_witness:", data.slice(pos_s, pos_e ));
+
+    if(num_witness > 0){
+      for (let i =0; i < num_witness; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+
+        const witness_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+        pos_s = pos_e;
+        pos_e = pos_e + witness_length; // uint16
+
+        const witness_bin = data.slice(pos_s, pos_e);
+        this.witness = new BBcWitness();
+        this.witness.unpack(witness_bin);
+        this.witness.show_str();
+        this.witness.transaction = this;
+      }
     }
 
-    if (tx_base['cross_ref']) {
-      this.cross_ref = new BBcCrossRef();
-      this.cross_ref.deserialize(tx_base['cross_ref']);
-    } else {
-      this.cross_ref = null;
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_crossref = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    //console.log("de num num_crossref:",num_crossref );
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+    if(num_crossref > 0){
+      for (let i =0; i < num_crossref; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+        const crossref_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+
+        pos_s = pos_e;
+        pos_e = pos_e + crossref_length; // uint16
+        const crossref_bin = data.slice(pos_s, pos_e);
+
+        this.cross_ref = new BBcCrossRef();
+        this.cross_ref.unpack(crossref_bin);
+      }
     }
 
-    this.signatures = [];
-    if (bson_data['signatures']) {
-      for (let i = 0; i < bson_data['signatures'].length; i++) {
+    pos_s = pos_e;
+    pos_e = pos_e + 2; // uint16
+    const num_signature = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    //console.log("de num num_signature:",num_signature );
+    //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+    if(num_signature > 0){
+      for (let i =0; i < num_signature; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 4; // uint16
+        const signature_length = helper.hboToInt32(data.slice(pos_s, pos_e));
+        //console.log("de num signature_length:",signature_length );
+        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
+
+        pos_s = pos_e;
+        pos_e = pos_e + signature_length; // uint16
+        const signature_bin = data.slice(pos_s, pos_e);
+        //console.log("de signature_bin:",signature_bin );
+        //console.log('bin:', jseu.encoder.arrayBufferToHexString(data.slice(pos_s, pos_e)));
         const sig = new BBcSignature(2);
-        await sig.deserialize(bson_data['signatures'][i]);
+        await sig.unpack(signature_bin);
         this.signatures.push(sig);
       }
     }
 
-    await this.set_transaction_id();
     return true;
   }
 
