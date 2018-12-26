@@ -1,5 +1,6 @@
 import * as para from '../parameter.js';
 import * as helper from '../helper';
+import jseu from 'js-encoding-utils';
 
 export class BBcWitness{
   constructor() {
@@ -14,11 +15,11 @@ export class BBcWitness{
     console.log('this.transaction :',this.transaction);
     for (let i = 0; i < this.user_ids.length; i++) {
       // eslint-disable-next-line no-console
-      console.log('this.user_ids[', i, '] :',this.user_ids[i].toString('hex'));
+      console.log('this.user_ids[', i, '] :', jseu.encoder.arrayBufferToHexString(this.user_ids[i]));
     }
     for (let i = 0; i < this.sig_indices.length; i++) {
       // eslint-disable-next-line no-console
-      console.log('this.sig_indices[', i, '] :',this.sig_indices[i]);
+      console.log('this.sig_indices[', i, '] :', this.sig_indices[i]);
     }
   }
 
@@ -54,7 +55,7 @@ export class BBcWitness{
     const elements_len = this.user_ids.length;
     binary_data = binary_data.concat(Array.from(helper.hbo(elements_len, 2)));
     for (let i = 0; i < elements_len; i++) {
-      binary_data = binary_data.concat(Array.from(helper.hbo(this.id_length, 2)));
+      binary_data = binary_data.concat(Array.from(helper.hbo(this.user_ids[i].length, 2)));
       binary_data = binary_data.concat(Array.from(this.user_ids[i]));
       binary_data = binary_data.concat(Array.from(helper.hbo(this.sig_indices[i], 2)));
     }
@@ -68,16 +69,17 @@ export class BBcWitness{
     for (let i = 0; i < user_ids_length; i++) {
       pos_s = pos_e;
       pos_e = pos_e + 2;
-      const value_length = helper.hboToInt16(data.slice(pos_s, pos_e));
+      const user_value_length = helper.hboToInt16(data.slice(pos_s, pos_e));
 
       pos_s = pos_e;
-      pos_e = pos_e + value_length;
+      pos_e = pos_e + user_value_length;
       this.user_ids.push(data.slice(pos_s, pos_e));
 
       pos_s = pos_e;
       pos_e = pos_e + 2;
       const index_value = helper.hboToInt16(data.slice(pos_s, pos_e));
       this.sig_indices.push(index_value);
+
     }
   }
 }

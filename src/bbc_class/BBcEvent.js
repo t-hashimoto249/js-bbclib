@@ -101,7 +101,7 @@ export class BBcEvent{
       }
     }
 
-    binary_data = binary_data.concat(Array.from(helper.hbo(this.option_approver_num_numerator.length,2)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.option_approver_num_numerator,2)));
     binary_data = binary_data.concat(Array.from(helper.hbo(this.option_approver_num_denominator,2)));
     if(this.option_approver_num_denominator > 0){
       for (let i = 0; i < this.option_approver_num_denominator; i++){
@@ -119,10 +119,12 @@ export class BBcEvent{
     let pos_s = 0;
     let pos_e = 2; // uint16
     let value_length =  helper.hboToInt16(data.slice(pos_s,pos_e));
+
     if (value_length > 0){
       pos_s = pos_e;
       pos_e = pos_e + value_length;
       this.asset_group_id = data.slice(pos_s,pos_e);
+
     }
 
     pos_s = pos_e;
@@ -181,6 +183,7 @@ export class BBcEvent{
       pos_e = pos_e + value_length; // uint32
 
       const asset_bin = data.slice(pos_s, pos_e);
+
       this.asset = new BBcAsset(new Uint8Array(0));
       this.asset.unpack(asset_bin);
     }

@@ -16,16 +16,24 @@ describe(`${envName}: Test BBcWitness`, () => {
     console.log('Test for BBcWitness Class');
 
     const witness = new bbclib.BBcWitness();
-    const witness_load = new bbclib.BBcWitness();
-    witness.add_sig_indices(0);
-    const user_id_0 = Buffer.from(await jscu.random.getRandomBytes(32));
-    witness.add_user(user_id_0);
-    witness.add_sig_indices(1);
-    const user_id_1 = Buffer.from(await jscu.random.getRandomBytes(32));
-    witness.add_user(user_id_1);
 
+    const witness_load = new bbclib.BBcWitness();
+
+    witness.add_sig_indices(0);
+
+    const user_id_0 = await jscu.random.getRandomBytes(32);
+
+    witness.add_user(user_id_0);
+
+    witness.add_sig_indices(1);
+
+    const user_id_1 = await jscu.random.getRandomBytes(32);
+
+    witness.add_user(user_id_1);
     const s_witness = witness.pack();
+
     await witness_load.unpack(s_witness);
+
     expect(witness_load.sig_indices[0]).to.be.eq(0);
     expect(witness_load.user_ids[0]).to.be.eql(user_id_0);
     expect(witness_load.sig_indices[1]).to.be.eq(1);
@@ -37,6 +45,7 @@ describe(`${envName}: Test BBcWitness`, () => {
     const witness_data = helper.fromHexString(witness_hex_string);
     const bbcWitness_deserialize = new bbclib.BBcWitness();
     await bbcWitness_deserialize.unpack(witness_data);
+
     expect(bbcWitness_deserialize.sig_indices[0]).to.be.eq(0);
     const user_id_0_hex_string = '5e64bb946e38aa0dd3dce77abe38f017834bf1e32c2de1ced4bce443b8476502';
     const user_id_0_data = helper.fromHexString(user_id_0_hex_string);
@@ -46,4 +55,5 @@ describe(`${envName}: Test BBcWitness`, () => {
     const user_id_1_data = helper.fromHexString(user_id_1_hex_string);
     expect(bbcWitness_deserialize.user_ids[1]).to.be.eql(user_id_1_data);
   });
+
 });

@@ -40,8 +40,7 @@ const webpackConfig = {
   externals:[{
     'js-crypto-utils': false,
     'js-encoding-utils': false,
-    'bson': false,
-    'buffer': false,
+    'bn': false
   }],
   node: {
     fs: 'empty'
