@@ -48,7 +48,7 @@
     "circular-json": "0.5.9",
     "cross-env": "^5.2.0",
     "eslint": "5.11.1",
-    "gulp-babel": "7.0.1",
+    "gulp-babel": "8.0.0",
     "isparta": "4.1.1",
     "jsdom": "^13.0.0",
     "karma": "2.0.5",
