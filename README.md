@@ -25,88 +25,20 @@ $ yarn add js-bbclib
 $ git clone https://github.com/t-hashimoto249/js-bbclib.git
 ```
 
+# Feature for js-bbclib 
+
+Numeber is a one of primitive type in standard javascript by ECMA.
+By the standard document, the Number type has exactly 18437736874454810627 (that is, 264-253+3) values, representing the double-precision 64bit format IEEE 754-2008 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9007199254740990 (that is, 253-2) distinct “Not-a-Number” values of the IEEE Standard are represented in Javascript. The timestamp value in BBcTransaction is defined by 64bit number type in the standard document. In that case, it can not process for the Number type and is used bn class in bn.js(https://www.npmjs.com/package/bn.js). It is one of popular class for big number in javascript. 
+
+ 
 # Usage
-First, you set up bbccore(:9000) and bbc-app-rest(:3000) on localhost or anther node.
-
-・Make, serialize and sign transaction.
-
-```$xslt
-import * as bbclib from 'js-bbclib.js'
-
-//make transaction
-let user = "4d48ba82dc8607c9";
-let user_id = new Buffer(user, "hex");
-let keypair = new bbclib.KeyPair();
-keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
-let tx = await bbclib.helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
-
-//sign and add signature in transaction
-await bbclib.helper.sign_and_add_signature(tx, keypair)
-
-//serialize transaction for bson
-let bsonobj = await tx.serialize(false, true);
-
-//insert transaction in BBc-1
-let xhr = new XMLHttpRequest();
-let ip = "127.0.0.1"
-xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
-xhr.setRequestHeader('Content-Type', 'application/json');
-let parameter = {
-       'source_user_id': user1,
-       'transaction_bson': bbclib.helper.Base64.encode(bsonobj)
-};
-
-xhr.addEventListener("load", function (event) {
-    //get response from bbc-app-rest
-    if( event.target.status == 200 || event.target.status == 304 ) {    
-       
-    }else{
-       
-    }
-       
-});
-xhr.send(JSON.stringify(parameter));
-
 ```
-
-・Search, deserialize and verify transaction.
-
-```$xslt
 import * as bbclib from 'js-bbclib.js'
 
-//make transaction
-let user = "4d48ba82dc8607c9";
-let user_id = new Buffer(user, "hex");
-let keypair = new bbclib.KeyPair();
-keypair.generate(); // or keypair.set_key_pair(private_key, public_key)
-let tx = await bbclib.helper.make_transaction(user_id, 1, 0, true); # return BBcTransaction
-
-//sign and add signature in transaction
-await bbclib.helper.sign_and_add_signature(tx, keypair)
-
-//serialize transaction for bson
-let bsonobj = await tx.serialize(false, true);
-
-//insert transaction in BBc-1
-let xhr = new XMLHttpRequest();
-let ip = "127.0.0.1"
-xhr.open('POST', 'http://' + ip + ':3000/insert_transaction/' + domain, false);
-xhr.setRequestHeader('Content-Type', 'application/json');
-let parameter = {
-       'source_user_id': user1,
-       'transaction_bson': bbclib.helper.Base64.encode(bsonobj)
-};
-
-xhr.addEventListener("load", function (event) {
-    //get response from bbc-app-rest
-    if( event.target.status == 200 || event.target.status == 304 ) {    
-       
-    }else{
-       
-    }
-       
-});
-xhr.send(JSON.stringify(parameter));
+const witness = new bbclib.BBcWitness();
+const bin = witness.pack();
+const unpack_witness = new bbclib.BBcWitness();
+unpack_witness.unpack(bin);
 
 ```
 
