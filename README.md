@@ -25,7 +25,7 @@ $ yarn add js-bbclib
 $ git clone https://github.com/t-hashimoto249/js-bbclib.git
 ```
 
-# Feature for js-bbclib 
+# Feature in js-bbclib 
 
 Numeber is a one of primitive type in standard javascript by ECMA.
 By the standard document, the Number type has exactly 18437736874454810627 (that is, 264-253+3) values, representing the double-precision 64bit format IEEE 754-2008 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic, except that the 9007199254740990 (that is, 253-2) distinct “Not-a-Number” values of the IEEE Standard are represented in Javascript. The timestamp value in BBcTransaction is defined by 64bit number type in the standard document. In that case, it can not process for the Number type and is used bn class in bn.js(https://www.npmjs.com/package/bn.js). It is one of popular class for big number in javascript. 
