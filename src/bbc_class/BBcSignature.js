@@ -2,26 +2,28 @@ import { KeyPair } from './KeyPair.js';
 import jseu from 'js-encoding-utils';
 import * as helper from '../helper.js';
 
-
 import { Buffer } from 'buffer';
 
 export class BBcSignature{
   constructor(key_type) {
     this.key_type = key_type;
-    this.signature = null;
+    this.signature = new Uint8Array(0);
     this.pubkey = null;
-    this.pubkey_byte = null;
+    this.pubkey_byte = new Uint8Array(0);;
     this.keypair = null;
     this.not_initialized = true;
-
   }
 
   show_sig() {
     console.log('key_type :',this.key_type);
-    console.log('signature :', this.signature.toString('hex'));
-    console.log('pubkey :', this.pubkey);
-    console.log('pubkey_byte :', this.pubkey_byte.toString('hex'));
-    console.log('keypair :', this.keypair);
+    console.log('signature :', jseu.encoder.arrayBufferToHexString(this.signature));
+    if (this.pubkey != null){
+      console.log('pubkey :', this.pubkey);
+    }
+    console.log('pubkey_byte :', jseu.encoder.arrayBufferToHexString(this.pubkey_byte));
+    if (this.keypair != null) {
+      console.log('keypair :', this.keypair);
+    }
     console.log('not_initialized :',this.not_initialized);
   }
 
@@ -45,26 +47,46 @@ export class BBcSignature{
     this.signature = signature;
   }
 
-  serialize() {
-    const pubkey_len_bit = this.pubkey_byte.length * 8;
-    const sig_len_bit = this.signature.length * 8;
+  pack() {
 
-    return {
-      'key_type': this.key_type,
-      'pubkey_len': pubkey_len_bit,
-      'pubkey': this.pubkey_byte,
-      'signature_len': sig_len_bit,
-      'signature': new Buffer(this.signature),
-    };
+    let binary_data = [];
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.key_type,4)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.pubkey_byte.length * 8, 4)));
+    binary_data = binary_data.concat(Array.from(this.pubkey_byte));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.signature.length * 8, 4)));
+    binary_data = binary_data.concat(Array.from(this.signature));
+
+    return new Uint8Array(binary_data);
   }
 
-  async deserialize(data) {
-    this.key_type = data['key_type'];
-    const pubkey = data['pubkey'];
-    const signature = data['signature'];
+  async unpack(data) {
+    let pos_s = 0;
+    let pos_e = 4; // uint32
+    this.key_type =  helper.hboToInt32(data.slice(pos_s,pos_e));
+
+    pos_s = pos_e;
+    pos_e = pos_e + 4; // uint32
+    let value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
+
+    if (value_length > 0) {
+      pos_s = pos_e;
+      pos_e = pos_e + (value_length / 8);
+      this.pubkey_byte = data.slice(pos_s, pos_e);
+    }
+
+    pos_s = pos_e;
+    pos_e = pos_e + 4; // uint32
+    value_length =  helper.hboToInt32(data.slice(pos_s,pos_e));
+
+    if (value_length > 0) {
+      pos_s = pos_e;
+      pos_e = pos_e + (value_length / 8 );
+      this.signature = data.slice(pos_s, pos_e);
+    }
 
     //65byteの鍵形式からJwkへ変換してinput
-    await this.add(signature, this.convertRawHexKeyToJwk(pubkey, 'P-256'));
+    await this.add(this.signature, this.convertRawHexKeyToJwk(this.pubkey_byte, 'P-256'));
     return true;
   }
 

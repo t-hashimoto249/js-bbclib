@@ -1,12 +1,11 @@
 import * as para from '../parameter.js';
 import * as helper from '../helper.js';
-import { Buffer } from 'buffer';
 
 export class BBcReference{
   constructor(asset_group_id, transaction, ref_transaction, event_index_in_ref) {
     this.id_length = para.DefaultLength.BBcOne;
     this.asset_group_id = asset_group_id;
-    this.transaction_id = new Buffer(this.id_length);
+    this.transaction_id = new Uint8Array(this.id_length);
     this.transaction = transaction;
     this.ref_transaction = ref_transaction;
     this.event_index_in_ref = event_index_in_ref;
@@ -63,20 +62,59 @@ export class BBcReference{
     return this.mandatory_approvers + this.option_approvers;
   }
 
-  serialize() {
-    return {
-      'asset_group_id': this.asset_group_id,
-      'transaction_id': this.transaction_id,
-      'event_index_in_ref': this.event_index_in_ref,
-      'sig_indices': this.sig_indices
-    };
+  pack() {
+    let binary_data = [];
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.asset_group_id.length, 2)));
+    binary_data = binary_data.concat(Array.from(this.asset_group_id));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.transaction_id.length, 2)));
+    binary_data = binary_data.concat(Array.from(this.transaction_id));
+
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.event_index_in_ref, 2)));
+    binary_data = binary_data.concat(Array.from(helper.hbo(this.sig_indices.length, 2)));
+
+    for (let i = 0; i < this.sig_indices.length; i++){
+      binary_data = binary_data.concat(Array.from(helper.hbo(this.sig_indices[i], 2)));
+    }
+
+    return new Uint8Array(binary_data);
+
   }
 
-  deserialize(data) {
-    this.asset_group_id = data['asset_group_id'];
-    this.transaction_id = data['transaction_id'];
-    this.event_index_in_ref = data['event_index_in_ref'];
-    this.sig_indices = data['sig_indices'];
+  unpack(data) {
+    let pos_s = 0;
+    let pos_e = 2; // uint16
+    let value_length = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    pos_s = pos_e;
+    pos_e = pos_e + value_length;
+    this.asset_group_id = data.slice(pos_s, pos_e);
+
+    pos_s = pos_e;
+    pos_e = pos_e + 2;
+    value_length = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    pos_s = pos_e;
+    pos_e = pos_e + value_length;
+    this.transaction_id = data.slice(pos_s, pos_e);
+
+    pos_s = pos_e;
+    pos_e = pos_e + 2;
+    this.event_index_in_ref = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    pos_s = pos_e;
+    pos_e = pos_e + 2;
+    const num_sig_indices = helper.hboToInt16(data.slice(pos_s, pos_e));
+
+    if (num_sig_indices > 0){
+      for (let i =0; i < num_sig_indices; i++){
+        pos_s = pos_e;
+        pos_e = pos_e + 2;
+        const sig_indice = helper.hboToInt16(data.slice(pos_s, pos_e));
+        this.sig_indices.push(sig_indice);
+      }
+    }
+
     return true;
   }
 
