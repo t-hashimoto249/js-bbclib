@@ -1,3 +1,5 @@
+This repo is now obsoleted, and move to https://github.com/beyond-blockchain/js-bbclib.git
+
 Name
 =====
 BBc-1(Beyond Block-chain One) Library, written in Javascript. 
