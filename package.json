@@ -61,7 +61,7 @@
     "mocha": "5.2.0",
     "sinon": "7.2.3",
     "webpack": "4.29.1",
-    "webpack-cli": "3.2.1",
+    "webpack-cli": "3.2.3",
     "webpack-common-shake": "2.1.0",
     "webpack-merge": "4.2.1"
   },
