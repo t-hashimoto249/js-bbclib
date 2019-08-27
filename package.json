@@ -63,7 +63,7 @@
     "webpack": "4.39.3",
     "webpack-cli": "3.3.7",
     "webpack-common-shake": "2.1.0",
-    "webpack-merge": "4.2.1"
+    "webpack-merge": "4.2.2"
   },
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
