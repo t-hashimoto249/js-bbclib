@@ -46,7 +46,7 @@
     "chai-arrays": "2.0.0",
     "chai-bytes": "0.1.2",
     "circular-json": "0.5.9",
-    "cross-env": "^5.2.0",
+    "cross-env": "^6.0.0",
     "eslint": "5.16.0",
     "gulp-babel": "8.0.0",
     "isparta": "4.1.1",
