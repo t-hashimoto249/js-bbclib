@@ -59,7 +59,7 @@
     "karma-mocha-reporter": "2.2.5",
     "karma-webpack": "3.0.5",
     "mocha": "5.2.0",
-    "sinon": "7.4.2",
+    "sinon": "7.5.0",
     "webpack": "4.40.2",
     "webpack-cli": "3.3.9",
     "webpack-common-shake": "2.1.0",
