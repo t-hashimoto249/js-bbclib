@@ -43,7 +43,7 @@
     "babel-plugin-istanbul": "6.0.0",
     "babel-plugin-transform-remove-console": "6.9.4",
     "chai": "4.2.0",
-    "chai-arrays": "2.0.0",
+    "chai-arrays": "2.2.0",
     "chai-bytes": "0.1.2",
     "circular-json": "0.5.9",
     "cross-env": "^5.2.0",
