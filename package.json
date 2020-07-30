@@ -60,7 +60,7 @@
     "karma-webpack": "4.0.2",
     "mocha": "5.2.0",
     "sinon": "7.5.0",
-    "webpack": "4.44.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
     "webpack-common-shake": "2.1.0",
     "webpack-merge": "4.2.2"
